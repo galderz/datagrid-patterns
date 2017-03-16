@@ -31,7 +31,7 @@ import delays.cq.sbb.Train;
  */
 public class App
 {
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws Exception {
         System.out.println("Hello World!");
 
         ConfigurationBuilder builder = new ConfigurationBuilder();
