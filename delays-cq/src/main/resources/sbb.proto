@@ -72,7 +72,7 @@ message StationBoardEntry {
     /**
      * @Field(store = Store.YES)
      */
-    optional int32 delayMin = 5;
+    optional int64 delayMin = 5;
 
 }
 

@@ -51,9 +51,6 @@ public class JsonTest {
       assertEquals("Waldenburg", to);
       String cat = (String) json.get("category");
       assertEquals("R", cat);
-
-//      try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
-//      }
    }
    
 }

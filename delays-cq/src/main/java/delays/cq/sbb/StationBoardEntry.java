@@ -10,11 +10,11 @@ public class StationBoardEntry {
    private Train train;
    private Date departureTs;
    private String platform;
+   private Long delayMin;
 
    private Date arrivalTs; // nullable
-   private Integer delayMin; // nullable
 
-   public StationBoardEntry(Train train, Date departureTs, String platform, Date arrivalTs, Integer delayMin) {
+   public StationBoardEntry(Train train, Date departureTs, String platform, Date arrivalTs, Long delayMin) {
       this.train = train;
       this.departureTs = departureTs;
       this.platform = platform;
@@ -54,11 +54,11 @@ public class StationBoardEntry {
       this.arrivalTs = arrivalTs;
    }
 
-   public Integer getDelayMin() {
+   public Long getDelayMin() {
       return delayMin;
    }
 
-   public void setDelayMin(Integer delayMin) {
+   public void setDelayMin(Long delayMin) {
       this.delayMin = delayMin;
    }
 
@@ -83,9 +83,8 @@ public class StationBoardEntry {
       if (!train.equals(that.train)) return false;
       if (!departureTs.equals(that.departureTs)) return false;
       if (!platform.equals(that.platform)) return false;
-      if (arrivalTs != null ? !arrivalTs.equals(that.arrivalTs) : that.arrivalTs != null)
-         return false;
-      return delayMin != null ? delayMin.equals(that.delayMin) : that.delayMin == null;
+      if (!delayMin.equals(that.delayMin)) return false;
+      return arrivalTs != null ? arrivalTs.equals(that.arrivalTs) : that.arrivalTs == null;
    }
 
    @Override
@@ -93,8 +92,8 @@ public class StationBoardEntry {
       int result = train.hashCode();
       result = 31 * result + departureTs.hashCode();
       result = 31 * result + platform.hashCode();
+      result = 31 * result + delayMin.hashCode();
       result = 31 * result + (arrivalTs != null ? arrivalTs.hashCode() : 0);
-      result = 31 * result + (delayMin != null ? delayMin.hashCode() : 0);
       return result;
    }
 
@@ -106,7 +105,7 @@ public class StationBoardEntry {
          Date departureTs = reader.readDate("departureTs");
          String platform = reader.readString("platform");
          Date arrivalTs = reader.readDate("arrivalTs");
-         Integer delayMin = reader.readInt("delayMin");
+         Long delayMin = reader.readLong("delayMin");
          return new StationBoardEntry(train, departureTs, platform, arrivalTs, delayMin);
       }
 
@@ -116,8 +115,7 @@ public class StationBoardEntry {
          writer.writeDate("departureTs", entry.getDepartureTs());
          writer.writeString("platform", entry.getPlatform());
          writer.writeDate("arrivalTs", entry.getArrivalTs());
-         writer.writeInt("delayMin", entry.getDelayMin());
-         
+         writer.writeLong("delayMin", entry.getDelayMin());
       }
 
       @Override

@@ -70,7 +70,7 @@ public class RemoteCqTest {
          assertEquals(user1, remote.get(1));
 
          QueryFactory qf = Search.getQueryFactory(remote);
-         Query query = qf.from(User.class)
+         Query query = qf.from(Address.class)
                .having("age").gt(20)
                .build();
 
