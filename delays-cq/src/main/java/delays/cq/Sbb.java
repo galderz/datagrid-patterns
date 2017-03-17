@@ -1,7 +1,12 @@
 package delays.cq;
 
+import static delays.cq.Util.r;
+import static delays.cq.Util.s;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,13 +15,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import delays.cq.sbb.GeoLoc;
 import delays.cq.sbb.StationBoard;
@@ -29,12 +36,19 @@ public class Sbb {
    //static final String FILE_NAME = "../../cff-stop-2016-02-29__.jsonl";
    static final String FILE_NAME = "src/main/resources/stationboard-sample.jsonl";
 
-   static Map.Entry<Stop, StationBoard> headStationBoard() {
-      try (Stream<String> lines = lines(FILE_NAME)) {
+   static final String GZIP_FILE_NAME = "src/main/resources/cff-stop-2016-02-29__.jsonl.gz";
+   static final String GZIP_TARGET_FILE_NAME = String.format(
+         "%s/cff-stop-2016-02-29__.jsonl.gz",
+         System.getProperty("java.io.tmpdir"));
+
+   static final int SPEEDUP = 10;
+
+   static Map.Entry<Stop, StationBoard> headStationBoard() throws IOException {
+      try (Stream<String> lines = Files.lines(Paths.get(FILE_NAME))) {
          String entry = lines.findFirst().get();
 
          JSONParser parser = new JSONParser();
-         JSONObject json = (JSONObject) parseJson(entry, parser);
+         JSONObject json = (JSONObject) s(() -> parser.parse(entry));
 
          JSONObject jsonStop = (JSONObject) json.get("stop");
          JSONObject jsonSt = (JSONObject) jsonStop.get("station");
@@ -54,13 +68,21 @@ public class Sbb {
    static Stop prevStop = null;
    static Date prevTs = null;
 
-   static void cycle(RemoteCache<Stop, StationBoard> boards) {
-      try (Stream<String> lines = lines(FILE_NAME)) {
-         // TODO: Group by... 
+   static Future<Void> cycle(RemoteCache<Stop, StationBoard> boards) throws Exception {
+      return Executors.newSingleThreadExecutor().submit(() -> {
+         doCycle(boards);
+         return null;
+      });
+   }
+
+   private static void doCycle(RemoteCache<Stop, StationBoard> boards) throws Exception {
+      Path gunzipped = Gzip.gunzip(new File(GZIP_FILE_NAME), new File(GZIP_TARGET_FILE_NAME));
+      try (Stream<String> lines = Files.lines(gunzipped)) {
+         // TODO: Group by...
          JSONParser parser = new JSONParser();
          List<StationBoardEntry> boardEntries = new ArrayList<>();
          lines.forEach(l -> {
-            JSONObject json = (JSONObject) parseJson(l, parser);
+            JSONObject json = (JSONObject) s(() -> parser.parse(l));
             JSONObject jsonStop = (JSONObject) json.get("stop");
             JSONObject jsonSt = (JSONObject) jsonStop.get("station");
 
@@ -78,7 +100,10 @@ public class Sbb {
                boardEntries.add(boardEntry);
             } else {
                long diff = dateDiff(prevTs, ts, TimeUnit.MILLISECONDS);
-               System.out.println("Time difference is: " + diff + "ms");
+               // System.out.println("Time difference is: " + diff + "ms");
+               if (diff > 0)
+                  r(() -> Thread.sleep(diff / SPEEDUP));
+               
                boards.put(prevStop, new StationBoard(prevTs, boardEntries));
                boardEntries.clear();
                boardEntries.add(boardEntry);
@@ -91,7 +116,7 @@ public class Sbb {
       }
    }
 
-   public static long dateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+   private static long dateDiff(Date date1, Date date2, TimeUnit timeUnit) {
       long diffInMillies = date2.getTime() - date1.getTime();
       return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
    }
@@ -137,22 +162,6 @@ public class Sbb {
       Double lat = (Double) coord.get("x");
       Double lng = (Double) coord.get("y");
       return new GeoLoc(lat, lng);
-   }
-
-   private static Object parseJson(String entry, JSONParser parser) {
-      try {
-         return parser.parse(entry);
-      } catch (ParseException e) {
-         throw new AssertionError(e);
-      }
-   }
-
-   private static Stream<String> lines(String fileName) {
-      try {
-         return Files.lines(Paths.get(fileName));
-      } catch (IOException e) {
-         throw new AssertionError(e);
-      }
    }
 
 }
