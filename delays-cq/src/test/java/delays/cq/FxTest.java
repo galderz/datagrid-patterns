@@ -24,7 +24,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-public class FxApp extends Application {
+public class FxTest extends Application {
 
    private TableView<StationBoardLine> table = new TableView<>();
 
@@ -49,22 +49,14 @@ public class FxApp extends Application {
 
    @Override
    public void start(Stage stage) {
-      Scene scene = new Scene(new Group());
-      stage.setTitle("Swiss Transport");
-      stage.setWidth(750);
-      stage.setHeight(500);
-
-//      BorderPane root = new BorderPane();
-//      Scene scene = new Scene(root, 400,400);
-
-      final Label label = new Label("Delayed Trains");
-      label.setFont(new Font("Arial", 20));
+      BorderPane root = new BorderPane();
+      Scene scene = new Scene(root, 800, 600);
 
       table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
       table.setEditable(true);
 
       TableColumn typeCol = getTableCol("Type", 10, "type");
-      TableColumn departureCol = getTableCol("Departure", 20, "departure");
+      TableColumn departureCol = getTableCol("Departure", 30, "departure");
       TableColumn stationCol = getTableCol("Station", 200, "station");
       TableColumn destinationCol = getTableCol("Destination", 200, "destination");
       TableColumn delayCol = getTableCol("Delay", 20, "delay");
@@ -77,33 +69,30 @@ public class FxApp extends Application {
       table.getColumns().addAll(
             typeCol, departureCol, stationCol, destinationCol, delayCol, trainName);
 
-      final VBox vbox = new VBox();
-      vbox.setSpacing(5);
-      vbox.setPadding(new Insets(10, 0, 0, 10));
-      vbox.getChildren().addAll(label, table);
+//      final VBox vbox = new VBox();
+//      vbox.setSpacing(5);
+//      vbox.setPadding(new Insets(10, 0, 0, 10));
+//      vbox.getChildren().addAll(label, table);
+//
+//      ((Group) scene.getRoot()).getChildren().addAll(vbox);
 
-      ((Group) scene.getRoot()).getChildren().addAll(vbox);
+      root.setCenter(table);
 
-//      root.setCenter(table);
+      stage.setTitle("Swiss Transport Delays Board");
       stage.setScene(scene);
       stage.show();
 
-      exec.submit(new Callable<Object>() {
-         @Override
-         public Object call() throws Exception {
-            Thread.sleep(2000);
-            data.add(new StationBoardLine(
-                  "ICE", "16:47", "Basel Bad Bf", "Chur", "+36", "ICE 75")
-            );
-            return null;
-         }
+      exec.submit(() -> {
+         Thread.sleep(2000);
+         data.add(new StationBoardLine(
+               "ICE", "16:47", "Basel Bad Bf", "Chur", "+36", "ICE 75")
+         );
+         return null;
       });
 
-      stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-         public void handle(WindowEvent we) {
-            exec.shutdown();
-            System.out.println("Bye.");
-         }
+      stage.setOnCloseRequest(we -> {
+         exec.shutdown();
+         System.out.println("Bye.");
       });
    }
 
