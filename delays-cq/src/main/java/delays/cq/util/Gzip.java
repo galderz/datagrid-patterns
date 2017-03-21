@@ -1,18 +1,14 @@
-package delays.cq;
-
-import static delays.cq.Util.r;
-import static delays.cq.Util.s;
+package delays.cq.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 
 public class Gzip {
 
-   static Path gunzip(File from, File to) throws Exception {
+   public static Path gunzip(File from, File to) throws Exception {
       if (!to.exists()) {
          byte[] buffer = new byte[1024];
          FileInputStream fis = new FileInputStream(from);

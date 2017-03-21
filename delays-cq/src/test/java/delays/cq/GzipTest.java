@@ -1,10 +1,11 @@
 package delays.cq;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 
 import org.junit.Test;
+
+import delays.cq.util.Gzip;
 
 public class GzipTest {
 

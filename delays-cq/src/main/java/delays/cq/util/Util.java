@@ -1,10 +1,10 @@
-package delays.cq;
+package delays.cq.util;
 
 import java.util.function.Function;
 
 public class Util {
 
-   static <T> T s(NoisySupplier<T> s) {
+   public static <T> T s(NoisySupplier<T> s) {
       try {
          return s.get();
       } catch (Exception e) {
@@ -12,7 +12,7 @@ public class Util {
       }
    }
 
-   static void r(NoisyRunnable r) {
+   public static void r(NoisyRunnable r) {
       try {
          r.run();
       } catch (Exception e) {
@@ -20,11 +20,11 @@ public class Util {
       }
    }
 
-   interface NoisySupplier<T> {
+   public interface NoisySupplier<T> {
       T get() throws Exception;
    }
 
-   interface NoisyRunnable {
+   public interface NoisyRunnable {
       void run() throws Exception;
    }
 

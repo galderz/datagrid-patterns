@@ -1,7 +1,7 @@
 package delays.cq;
 
-import static delays.cq.Util.r;
-import static delays.cq.Util.s;
+import static delays.cq.util.Util.r;
+import static delays.cq.util.Util.s;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +29,7 @@ import delays.cq.sbb.StationBoard;
 import delays.cq.sbb.StationBoardEntry;
 import delays.cq.sbb.Stop;
 import delays.cq.sbb.Train;
+import delays.cq.util.Gzip;
 
 public class Sbb {
 
@@ -38,7 +38,12 @@ public class Sbb {
 
    static final String GZIP_FILE_NAME = "src/main/resources/cff-stop-2016-02-29__.jsonl.gz";
    static final String GZIP_TARGET_FILE_NAME = String.format(
-         "%s/cff-stop-2016-02-29__.jsonl.gz",
+         "%s/cff-stop-2016-02-29__.jsonl",
+         System.getProperty("java.io.tmpdir"));
+
+   static final String GZIP_FILE_V2_NAME = "src/main/resources/cff-stop-2016-02-29__v2.jsonl.gz";
+   static final String GZIP_TARGET_FILE_V2_NAME = String.format(
+         "%s/cff-stop-2016-02-29__v2.jsonl",
          System.getProperty("java.io.tmpdir"));
 
    static final int SPEEDUP = 10;
@@ -69,14 +74,14 @@ public class Sbb {
    static Date prevTs = null;
 
    static Future<Void> cycle(RemoteCache<Stop, StationBoard> boards) throws Exception {
+      Path gunzipped = Gzip.gunzip(new File(GZIP_FILE_NAME), new File(GZIP_TARGET_FILE_NAME));
       return Executors.newSingleThreadExecutor().submit(() -> {
-         doCycle(boards);
+         doCycle(boards, gunzipped);
          return null;
       });
    }
 
-   private static void doCycle(RemoteCache<Stop, StationBoard> boards) throws Exception {
-      Path gunzipped = Gzip.gunzip(new File(GZIP_FILE_NAME), new File(GZIP_TARGET_FILE_NAME));
+   private static void doCycle(RemoteCache<Stop, StationBoard> boards, Path gunzipped) throws Exception {
       try (Stream<String> lines = Files.lines(gunzipped)) {
          // TODO: Group by...
          JSONParser parser = new JSONParser();
@@ -100,7 +105,7 @@ public class Sbb {
                boardEntries.add(boardEntry);
             } else {
                long diff = dateDiff(prevTs, ts, TimeUnit.MILLISECONDS);
-               // System.out.println("Time difference is: " + diff + "ms");
+//               System.out.println("Time difference is: " + diff + "ms");
                if (diff > 0)
                   r(() -> Thread.sleep(diff / SPEEDUP));
                
