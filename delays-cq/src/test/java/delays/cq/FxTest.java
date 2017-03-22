@@ -1,47 +1,27 @@
 package delays.cq;
 
-import java.util.Comparator;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
+import javafx.concurrent.Task;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+
+import java.util.Comparator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FxTest extends Application {
 
    private TableView<StationBoardLine> table = new TableView<>();
-
-//   private final SortedList<StationBoardLine> data = new SortedList<>(
-//         FXCollections.observableArrayList(
-//               new StationBoardLine(
-//                     "RE", "17:14", "Basel Bad Bf", "Basel SBB", "+3", "RE 5343")
-//         ), new DelayComparator());
-
-   private final ObservableList<StationBoardLine> data =
-         FXCollections.observableArrayList(
-               new StationBoardLine(
-                     "RE", "17:14", "Basel Bad Bf", "Basel SBB", "+3", "RE 5343")
-         );
-
-   private final ExecutorService exec =
-         Executors.newSingleThreadExecutor();
+   private final ExecutorService exec = Executors.newSingleThreadExecutor();
 
    public static void main(String[] args) {
       launch(args);
@@ -62,46 +42,61 @@ public class FxTest extends Application {
       TableColumn delayCol = getTableCol("Delay", 20, "delay");
       TableColumn trainName = getTableCol("Train Name", 50, "trainName");
 
-      SortedList<StationBoardLine> sorted = new SortedList<>(data, new DelayComparator());
-      table.setItems(sorted);
-      //sorted.comparatorProperty().bind(table.comparatorProperty());
-
       table.getColumns().addAll(
             typeCol, departureCol, stationCol, destinationCol, delayCol, trainName);
 
-//      final VBox vbox = new VBox();
-//      vbox.setSpacing(5);
-//      vbox.setPadding(new Insets(10, 0, 0, 10));
-//      vbox.getChildren().addAll(label, table);
-//
-//      ((Group) scene.getRoot()).getChildren().addAll(vbox);
-
       root.setCenter(table);
+
+      PartialResultsTask task = new PartialResultsTask();
+      SortedList<StationBoardLine> sorted = new SortedList<>(task.getPartialResults(), new DelayComparator());
+      table.setItems(sorted);
+      exec.submit(task);
 
       stage.setTitle("Swiss Transport Delays Board");
       stage.setScene(scene);
       stage.show();
+   }
 
-      exec.submit(() -> {
-         Thread.sleep(2000);
-         data.add(new StationBoardLine(
-               "ICE", "16:47", "Basel Bad Bf", "Chur", "+36", "ICE 75")
-         );
-         return null;
-      });
-
-      stage.setOnCloseRequest(we -> {
-         exec.shutdown();
-         System.out.println("Bye.");
-      });
+   @Override
+   public void stop() throws Exception {
+      exec.shutdownNow();
    }
 
    private TableColumn getTableCol(String colName, int minWidth, String fieldName) {
-      TableColumn typeCol = new TableColumn(colName);
+      TableColumn<StationBoardLine, String> typeCol = new TableColumn<>(colName);
       typeCol.setMinWidth(minWidth);
-      typeCol.setCellValueFactory(
-            new PropertyValueFactory<StationBoardLine, String>(fieldName));
+      typeCol.setCellValueFactory(new PropertyValueFactory<>(fieldName));
       return typeCol;
+   }
+
+   static final class DelayComparator implements Comparator<StationBoardLine> {
+
+      @Override
+      public int compare(StationBoardLine o1, StationBoardLine o2) {
+         return o1.getDelay().compareTo(o2.getDelay());
+      }
+
+   }
+
+   public class PartialResultsTask extends Task<Void> {
+
+      private ObservableList<StationBoardLine>partialResults = FXCollections.observableArrayList();
+
+      public final ObservableList<StationBoardLine> getPartialResults() {
+         return partialResults;
+      }
+
+      @Override protected Void call() throws Exception {
+         System.out.println("Creating station board entries...");
+         for (int i=5; i >= 1; i--) {
+            Thread.sleep(1000);
+            if (isCancelled()) break;
+            StationBoardLine l = new StationBoardLine(
+                  "ICE", "16:0" + i, "Basel Bad Bf", "Chur", String.valueOf(i), "ICE 75");
+            Platform.runLater(() -> partialResults.add(l));
+         }
+         return null;
+      }
    }
 
    public static final class StationBoardLine {
@@ -198,15 +193,4 @@ public class FxTest extends Application {
          this.trainName.set(trainName);
       }
    }
-
-   static final class DelayComparator implements Comparator<StationBoardLine> {
-
-      @Override
-      public int compare(StationBoardLine o1, StationBoardLine o2) {
-         int cmp = o1.getDelay().compareTo(o2.getDelay());
-         return -cmp;
-      }
-
-   }
-
 }

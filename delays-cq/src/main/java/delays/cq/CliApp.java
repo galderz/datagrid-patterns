@@ -1,9 +1,7 @@
 package delays.cq;
 
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
@@ -29,7 +27,7 @@ import delays.cq.sbb.Train;
  * Hello world!
  *
  */
-public class App
+public class CliApp
 {
     private static RemoteCache<Stop, StationBoard> boards;
     private static ContinuousQuery<Stop, StationBoard> continuousQuery;
@@ -127,7 +125,7 @@ public class App
 
     private static String read(String resourcePath) {
         try {
-            return Util.read(App.class.getResourceAsStream(resourcePath));
+            return Util.read(CliApp.class.getResourceAsStream(resourcePath));
         } catch (IOException e) {
             throw new AssertionError(e);
         }
