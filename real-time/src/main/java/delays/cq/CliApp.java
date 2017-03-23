@@ -58,7 +58,7 @@ public class CliApp {
             ctx.registerMarshaller(new Stop.Marshaller());
             ctx.registerMarshaller(new Train.Marshaller());
 
-            Future<Void> cycleFuture = Sbb.cycle(boards);
+            Future<Void> cycleFuture = Injector.cycle(boards);
             //System.out.println("Number of boards: " + boards.size());
 
             QueryFactory qf = Search.getQueryFactory(boards);

@@ -31,19 +31,13 @@ import delays.cq.sbb.Stop;
 import delays.cq.sbb.Train;
 import delays.cq.util.Gzip;
 
-public class Sbb {
+public class Injector {
 
-   //static final String FILE_NAME = "../../cff-stop-2016-02-29__.jsonl";
    static final String FILE_NAME = "src/main/resources/stationboard-sample.jsonl";
 
    static final String GZIP_FILE_NAME = "src/main/resources/cff-stop-2016-02-29__.jsonl.gz";
    static final String GZIP_TARGET_FILE_NAME = String.format(
          "%s/cff-stop-2016-02-29__.jsonl",
-         System.getProperty("java.io.tmpdir"));
-
-   static final String GZIP_FILE_V2_NAME = "src/main/resources/cff-stop-2016-02-29__v2.jsonl.gz";
-   static final String GZIP_TARGET_FILE_V2_NAME = String.format(
-         "%s/cff-stop-2016-02-29__v2.jsonl",
          System.getProperty("java.io.tmpdir"));
 
    static final int SPEEDUP = 10;
@@ -105,7 +99,6 @@ public class Sbb {
                boardEntries.add(boardEntry);
             } else {
                long diff = dateDiff(prevTs, ts, TimeUnit.MILLISECONDS);
-//               System.out.println("Time difference is: " + diff + "ms");
                if (diff > 0)
                   r(() -> Thread.sleep(diff / SPEEDUP));
                
