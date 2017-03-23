@@ -1,4 +1,4 @@
-package delays.cq;
+package test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,11 +27,11 @@ import org.infinispan.query.dsl.QueryFactory;
 import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 import org.junit.Test;
 
-import delays.cq.test.Address;
-import delays.cq.test.AddressMarshaller;
-import delays.cq.test.GenderMarshaller;
-import delays.cq.test.User;
-import delays.cq.test.UserMarshaller;
+import test.pojos.Address;
+import test.pojos.AddressMarshaller;
+import test.pojos.GenderMarshaller;
+import test.pojos.User;
+import test.pojos.UserMarshaller;
 
 public class RemoteCqTest {
 

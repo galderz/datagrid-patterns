@@ -1,4 +1,4 @@
-package delays.cq;
+package test;
 
 import java.io.File;
 import java.util.Random;

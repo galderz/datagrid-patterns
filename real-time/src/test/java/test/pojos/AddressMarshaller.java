@@ -1,4 +1,4 @@
-package delays.cq.test;
+package test.pojos;
 
 import java.io.IOException;
 
