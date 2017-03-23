@@ -1,4 +1,4 @@
-package delays.cq.sbb;
+package delays.query.continuous.sbb;
 
 import java.io.IOException;
 import java.util.ArrayList;

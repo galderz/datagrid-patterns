@@ -1,11 +1,10 @@
-package delays.cq;
-
-import static delays.cq.util.Util.r;
+package delays.query.continuous;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import delays.cq.view.StationBoardView;
+import delays.query.continuous.view.StationBoardView;
+import delays.query.continuous.util.Util;
 import javafx.application.Application;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.Scene;
@@ -55,7 +54,7 @@ public final class FxApp extends Application {
       exec.submit(task);
 
       stage.setOnCloseRequest(we -> {
-         r(this::stop);
+         Util.r(this::stop);
          System.out.println("Bye.");
       });
 

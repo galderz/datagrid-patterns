@@ -1,4 +1,4 @@
-package delays.cq.util;
+package delays.query.continuous.util;
 
 import java.io.File;
 import java.io.FileInputStream;

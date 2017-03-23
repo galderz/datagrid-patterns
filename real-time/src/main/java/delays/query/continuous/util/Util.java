@@ -1,6 +1,4 @@
-package delays.cq.util;
-
-import java.util.function.Function;
+package delays.query.continuous.util;
 
 public class Util {
 

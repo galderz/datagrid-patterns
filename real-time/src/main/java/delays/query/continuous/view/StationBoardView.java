@@ -1,4 +1,4 @@
-package delays.cq.view;
+package delays.query.continuous.view;
 
 import java.util.Comparator;
 

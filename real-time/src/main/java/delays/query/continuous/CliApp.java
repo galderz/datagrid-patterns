@@ -1,4 +1,4 @@
-package delays.cq;
+package delays.query.continuous;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -17,11 +17,11 @@ import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryFactory;
 import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 
-import delays.cq.sbb.GeoLoc;
-import delays.cq.sbb.StationBoard;
-import delays.cq.sbb.StationBoardEntry;
-import delays.cq.sbb.Stop;
-import delays.cq.sbb.Train;
+import delays.query.continuous.sbb.GeoLoc;
+import delays.query.continuous.sbb.StationBoard;
+import delays.query.continuous.sbb.StationBoardEntry;
+import delays.query.continuous.sbb.Stop;
+import delays.query.continuous.sbb.Train;
 
 /**
  * Command-Line interface application for showing a mock dashboard of

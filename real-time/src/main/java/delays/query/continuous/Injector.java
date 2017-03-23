@@ -1,7 +1,7 @@
-package delays.cq;
+package delays.query.continuous;
 
-import static delays.cq.util.Util.r;
-import static delays.cq.util.Util.s;
+import static delays.query.continuous.util.Util.r;
+import static delays.query.continuous.util.Util.s;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,12 +24,12 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import delays.cq.sbb.GeoLoc;
-import delays.cq.sbb.StationBoard;
-import delays.cq.sbb.StationBoardEntry;
-import delays.cq.sbb.Stop;
-import delays.cq.sbb.Train;
-import delays.cq.util.Gzip;
+import delays.query.continuous.sbb.GeoLoc;
+import delays.query.continuous.sbb.StationBoard;
+import delays.query.continuous.sbb.StationBoardEntry;
+import delays.query.continuous.sbb.Stop;
+import delays.query.continuous.sbb.Train;
+import delays.query.continuous.util.Gzip;
 
 public class Injector {
 

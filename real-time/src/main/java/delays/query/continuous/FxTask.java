@@ -1,4 +1,4 @@
-package delays.cq;
+package delays.query.continuous;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -19,12 +19,12 @@ import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryFactory;
 import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 
-import delays.cq.sbb.GeoLoc;
-import delays.cq.sbb.StationBoard;
-import delays.cq.sbb.StationBoardEntry;
-import delays.cq.sbb.Stop;
-import delays.cq.sbb.Train;
-import delays.cq.view.StationBoardView;
+import delays.query.continuous.sbb.GeoLoc;
+import delays.query.continuous.sbb.StationBoard;
+import delays.query.continuous.sbb.StationBoardEntry;
+import delays.query.continuous.sbb.Stop;
+import delays.query.continuous.sbb.Train;
+import delays.query.continuous.view.StationBoardView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

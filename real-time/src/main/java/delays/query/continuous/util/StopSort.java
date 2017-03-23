@@ -1,7 +1,4 @@
-package delays.cq.util;
-
-import static delays.cq.util.Util.r;
-import static delays.cq.util.Util.s;
+package delays.query.continuous.util;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -35,7 +32,7 @@ public class StopSort {
       try (Stream<String> lines = Files.lines(gunzipped)) {
          JSONParser parser = new JSONParser();
          lines.forEach(l -> {
-            JSONObject json = (JSONObject) s(() -> parser.parse(l));
+            JSONObject json = (JSONObject) Util.s(() -> parser.parse(l));
             JSONObject jsonStop = (JSONObject) json.get("stop");
             long departureTs = (long) jsonStop.get("departureTimestamp");
             List<String> departures = sorted.get(departureTs);
@@ -50,8 +47,8 @@ public class StopSort {
       FileWriter writer = new FileWriter(GZIP_TARGET_FILE_NAME);
       for(List<String> val : sorted.values()){
          val.forEach(l -> {
-            r(() -> writer.write(l));
-            r(() -> writer.write('\n'));
+            Util.r(() -> writer.write(l));
+            Util.r(() -> writer.write('\n'));
          });
       }
       writer.close();

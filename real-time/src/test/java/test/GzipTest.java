@@ -5,7 +5,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import delays.cq.util.Gzip;
+import delays.query.continuous.util.Gzip;
 
 public class GzipTest {
 
