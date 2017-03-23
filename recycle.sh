@@ -1,15 +1,47 @@
 #!/usr/bin/env bash
 
-SERVER_PATH=..
+set -e
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
-# Kill any server instances running
-pkill -9 -f ".*/java .* org.jboss.as.standalone .*"
+SERVER_ROOT=..
+SERVER_HOME=$SERVER_ROOT/infinispan
+CLUSTER_SIZE_MAIN="/host=master/server=server-three/subsystem=datagrid-infinispan/cache-container=clustered:read-attribute(name=cluster-size)"
 
-# Remove old server version
-rm -drf $SERVER_PATH/infinispan-server-9.0.0.CR3
 
-# Unzip new version
-unzip $SERVER_PATH/infinispan-server-9.0.0.CR3-bin.zip -d $SERVER_PATH
+function waitForClusters()
+{
+  MEMBERS_MAIN=''
+  while [ "$MEMBERS_MAIN" != \"3\" ];
+  do
+    MEMBERS_MAIN=$($SERVER_HOME/bin/ispn-cli.sh -c $CLUSTER_SIZE_MAIN | grep result | tr -d '\r' | awk '{print $3}')
+    echo "Waiting for clusters to form (main: $MEMBERS_MAIN)"
+    sleep 3
+  done
+}
 
-# Start new server
-$SERVER_PATH/infinispan/bin/standalone.sh &
+
+rm -drf $SERVER_ROOT/infinispan-server-9.0.0.CR3
+echo "Remove old server directory."
+
+
+unzip $SERVER_ROOT/infinispan-server-9.0.0.CR3-bin.zip -d $SERVER_ROOT
+echo "Unzipped server"
+
+
+cp domain.xml $SERVER_HOME/domain/configuration
+cp host.xml $SERVER_HOME/domain/configuration
+echo "Configuration files copied to server."
+
+
+$SERVER_HOME/bin/domain.sh &
+
+
+waitForClusters
+echo "Infinispan servers started."
+
+
+# Wait until script stopped
+while :
+do
+  sleep 5
+done
