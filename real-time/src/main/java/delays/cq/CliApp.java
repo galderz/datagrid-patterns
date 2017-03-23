@@ -24,11 +24,11 @@ import delays.cq.sbb.Stop;
 import delays.cq.sbb.Train;
 
 /**
- * Hello world!
- *
+ * Command-Line interface application for showing a mock dashboard of
+ * delayes trains.
  */
-public class CliApp
-{
+public class CliApp {
+
     private static RemoteCache<Stop, StationBoard> boards;
     private static ContinuousQuery<Stop, StationBoard> continuousQuery;
 
@@ -38,11 +38,11 @@ public class CliApp
         ConfigurationBuilder builder = new ConfigurationBuilder();
         builder.addServer()
               .host("localhost")
-              .port(11222)
+              .port(11322)
               .marshaller(new ProtoStreamMarshaller());
         RemoteCacheManager rcm = new RemoteCacheManager(builder.build());
 
-        boards = rcm.getCache("namedCache");
+        boards = rcm.getCache("default");
         try {
             RemoteCache<String, String> metaCache = rcm.getCache(ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME);
             metaCache.put("sbb.proto", read("/sbb.proto"));
