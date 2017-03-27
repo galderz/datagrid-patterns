@@ -1,9 +1,7 @@
-package delays.query.continuous.sbb;
+package delays.java.stream.pojos;
 
 import java.io.IOException;
 import java.util.Date;
-
-import org.infinispan.protostream.MessageMarshaller;
 
 public class StationBoardEntry {
 
@@ -95,39 +93,6 @@ public class StationBoardEntry {
       result = 31 * result + delayMin.hashCode();
       result = 31 * result + (arrivalTs != null ? arrivalTs.hashCode() : 0);
       return result;
-   }
-
-   public static final class Marshaller implements MessageMarshaller<StationBoardEntry> {
-
-      @Override
-      public StationBoardEntry readFrom(ProtoStreamReader reader) throws IOException {
-         Train train = reader.readObject("train", Train.class);
-         Date departureTs = reader.readDate("departureTs");
-         String platform = reader.readString("platform");
-         Date arrivalTs = reader.readDate("arrivalTs");
-         Long delayMin = reader.readLong("delayMin");
-         return new StationBoardEntry(train, departureTs, platform, arrivalTs, delayMin);
-      }
-
-      @Override
-      public void writeTo(ProtoStreamWriter writer, StationBoardEntry entry) throws IOException {
-         writer.writeObject("train", entry.getTrain(), Train.class);
-         writer.writeDate("departureTs", entry.getDepartureTs());
-         writer.writeString("platform", entry.getPlatform());
-         writer.writeDate("arrivalTs", entry.getArrivalTs());
-         writer.writeLong("delayMin", entry.getDelayMin());
-      }
-
-      @Override
-      public Class<? extends StationBoardEntry> getJavaClass() {
-         return StationBoardEntry.class;
-      }
-
-      @Override
-      public String getTypeName() {
-         return "sbb.StationBoardEntry";
-      }
-
    }
 
 }

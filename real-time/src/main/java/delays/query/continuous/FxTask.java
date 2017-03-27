@@ -19,11 +19,11 @@ import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryFactory;
 import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 
-import delays.query.continuous.sbb.GeoLoc;
-import delays.query.continuous.sbb.StationBoard;
-import delays.query.continuous.sbb.StationBoardEntry;
-import delays.query.continuous.sbb.Stop;
-import delays.query.continuous.sbb.Train;
+import delays.query.continuous.pojos.GeoLoc;
+import delays.query.continuous.pojos.StationBoard;
+import delays.query.continuous.pojos.StationBoardEntry;
+import delays.query.continuous.pojos.Stop;
+import delays.query.continuous.pojos.Train;
 import delays.query.continuous.view.StationBoardView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;

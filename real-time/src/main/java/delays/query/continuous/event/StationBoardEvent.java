@@ -2,8 +2,8 @@ package delays.query.continuous.event;
 
 import java.util.Date;
 
-import delays.query.continuous.sbb.Stop;
-import delays.query.continuous.sbb.Train;
+import delays.query.continuous.pojos.Stop;
+import delays.query.continuous.pojos.Train;
 
 public class StationBoardEvent {
 

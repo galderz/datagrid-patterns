@@ -24,11 +24,11 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import delays.query.continuous.sbb.GeoLoc;
-import delays.query.continuous.sbb.StationBoard;
-import delays.query.continuous.sbb.StationBoardEntry;
-import delays.query.continuous.sbb.Stop;
-import delays.query.continuous.sbb.Train;
+import delays.query.continuous.pojos.GeoLoc;
+import delays.query.continuous.pojos.StationBoard;
+import delays.query.continuous.pojos.StationBoardEntry;
+import delays.query.continuous.pojos.Stop;
+import delays.query.continuous.pojos.Train;
 import delays.query.continuous.util.Gzip;
 
 public class Injector {
