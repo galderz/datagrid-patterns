@@ -8,11 +8,11 @@
      <version>1.0-SNAPSHOT</version>
    </parent>
 
-  <artifactId>tasks-server</artifactId>
+  <artifactId>analytics-domain</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>tasks-server</name>
+  <name>analytics-domain</name>
   <url>http://maven.apache.org</url>
 
   <properties>
@@ -22,29 +22,18 @@
   <dependencies>
     <dependency>
       <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-tasks-api</artifactId>
+      <artifactId>infinispan-core</artifactId>
       <version>${infinispan.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <!--
-          mvn wildfly:deploy
-          mvn wildfly:redeploy
-          mvn wildfly:undeploy
-        -->
-        <groupId>org.wildfly.plugins</groupId>
-        <artifactId>wildfly-maven-plugin</artifactId>
-        <version>1.2.0.Alpha4</version>
-        <configuration>
-          <server-groups>
-            <server-group>cluster</server-group>
-          </server-groups>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

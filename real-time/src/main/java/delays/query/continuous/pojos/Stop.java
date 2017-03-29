@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.infinispan.protostream.MessageMarshaller;
 
+// TODO: Rename to Station
 public class Stop {
 
    private long id;

@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.infinispan.protostream.MessageMarshaller;
 
+// TODO: Rename to Stop
 public class StationBoardEntry {
 
    private Train train;
