@@ -23,7 +23,23 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-client-hotrod</artifactId>
-      <version>${infinispan.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-remote-query-client</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.infinispan.protostream</groupId>
+      <artifactId>protostream</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>datagrid-patterns</groupId>
+      <artifactId>analytics-domain</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!--

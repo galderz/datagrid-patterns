@@ -40,10 +40,10 @@ public class RemoteCqTest {
       ConfigurationBuilder builder = new ConfigurationBuilder();
       builder.addServer()
             .host("localhost")
-            .port(11222)
+            .port(11322)
             .marshaller(new ProtoStreamMarshaller());
       RemoteCacheManager rcm = new RemoteCacheManager(builder.build());
-      RemoteCache<Integer, User> remote = rcm.getCache("namedCache");
+      RemoteCache<Integer, User> remote = rcm.getCache("default");
       ContinuousQuery<Integer, User> continuousQuery = null;
       try {
          RemoteCache<String, String> metaCache = rcm.getCache(ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME);
@@ -70,7 +70,7 @@ public class RemoteCqTest {
          assertEquals(user1, remote.get(1));
 
          QueryFactory qf = Search.getQueryFactory(remote);
-         Query query = qf.from(Address.class)
+         Query query = qf.from(User.class)
                .having("age").gt(20)
                .build();
 

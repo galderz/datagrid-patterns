@@ -136,7 +136,7 @@
                     <distributed-cache name="memcachedCache"/>
                     <!-- MOD :: START :: add caches -->
                     <distributed-cache name="text">
-                        <compatibility enabled="true"/>
+                        <compatibility enabled="true" marshaller="org.infinispan.query.remote.CompatibilityProtoStreamMarshaller"/>
                     </distributed-cache>
                     <distributed-cache name="delays-offline"/>
                     <!-- MOD :: END -->

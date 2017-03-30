@@ -1,35 +1,92 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.infinispan.client.hotrod.marshall.ProtoStreamMarshaller;
+import org.infinispan.protostream.FileDescriptorSource;
+import org.infinispan.protostream.SerializationContext;
 import org.junit.Test;
+
+import test.pojos.Words;
 
 public class WordCountTest {
 
    @Test
-   public void testRemoteStreams() {
+   public void testRemoteStreams() throws IOException {
+      addRemoteProtos();
+
+      ConfigurationBuilder builder = new ConfigurationBuilder();
+      builder.addServer()
+            .host("localhost")
+            .port(11322)
+            .marshaller(new ProtoStreamMarshaller());
+      RemoteCacheManager rcm = new RemoteCacheManager(builder.build());
+      addLocalProtos(rcm);
+
+      RemoteCache<Integer, Words> remote = rcm.getCache("text");
+      Words words1 = new Words();
+      words1.setWords("word1 word2 word3");
+      remote.put(1, words1);
+      Words words2 = new Words();
+      words2.setWords("word1 word2");
+      remote.put(2, words2);
+      Words words3 = new Words();
+      words3.setWords("word1");
+      remote.put(3, words3);
+
+      executeWordCount();
+   }
+
+   private void executeWordCount() {
       ConfigurationBuilder builder = new ConfigurationBuilder();
       builder.addServer()
             .host("localhost")
             .port(11322);
+      //.marshaller(new ProtoStreamMarshaller());
       RemoteCacheManager rcm = new RemoteCacheManager(builder.build());
+      try {
+         RemoteCache<Integer, Words> remote = rcm.getCache("text");
+         Map<String, Long> resultWordCount = remote.execute("word-count", Collections.emptyMap());
+         assertEquals(3, resultWordCount.size());
+         assertEquals(3, resultWordCount.get("word1").intValue());
+         assertEquals(2, resultWordCount.get("word2").intValue());
+         assertEquals(1, resultWordCount.get("word3").intValue());
+      } finally {
+         rcm.stop();
+      }
+   }
 
-      RemoteCache<Integer, String> remote = rcm.getCache("text");
-      remote.put(1, "word1 word2 word3");
-      remote.put(2, "word1 word2");
-      remote.put(3, "word1");
+   private void addLocalProtos(RemoteCacheManager rcm) throws IOException {
+      RemoteCache<String, String> metaCache = rcm.getCache("___protobuf_metadata");
+      metaCache.put("words.proto", Words.proto());
+      assertFalse(metaCache.containsKey(".errors"));
+      SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(rcm);
+      ctx.registerProtoFiles(FileDescriptorSource.fromResources("words.proto"));
+      ctx.registerMarshaller(new Words.Marshaller());
+   }
 
-      Map<String, Long> result = remote.execute("word-count", Collections.emptyMap());
-      assertEquals(3, result.size());
-      assertEquals(3, result.get("word1").intValue());
-      assertEquals(2, result.get("word2").intValue());
-      assertEquals(1, result.get("word3").intValue());
+   private void addRemoteProtos() {
+      ConfigurationBuilder builder = new ConfigurationBuilder();
+      builder.addServer()
+            .host("localhost")
+            .port(11322);
+            //.marshaller(new ProtoStreamMarshaller());
+      RemoteCacheManager rcm = new RemoteCacheManager(builder.build());
+      try {
+         RemoteCache<Integer, Words> remote = rcm.getCache("text");
+         remote.execute("words-proto", Collections.emptyMap());
+      } finally {
+         rcm.stop();
+      }
    }
 
 }

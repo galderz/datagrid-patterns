@@ -17,9 +17,22 @@
   </properties>
 
   <modules>
-    <module>tasks-server</module>
+    <module>analytics-domain</module>
     <module>tasks-client</module>
+    <module>tasks-server</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-bom</artifactId>
+        <version>${infinispan.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>

@@ -33,6 +33,12 @@
       <version>4.7</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.infinispan.protostream</groupId>
+      <artifactId>protostream</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
 

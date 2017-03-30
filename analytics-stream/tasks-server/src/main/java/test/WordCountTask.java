@@ -9,6 +9,8 @@ import org.infinispan.stream.CacheCollectors;
 import org.infinispan.tasks.ServerTask;
 import org.infinispan.tasks.TaskContext;
 
+import test.pojos.Words;
+
 public class WordCountTask implements ServerTask {
 
    private TaskContext ctx;
@@ -25,18 +27,13 @@ public class WordCountTask implements ServerTask {
 
    @Override
    public Object call() throws Exception {
-      Cache<String, String> cache = getCache();
+      Cache<String, Words> cache = getCache();
 
       return cache.entrySet().stream()
-         .map(e -> e.getValue().split("\\s+"))
+         .map(e -> e.getValue().getWords().split("\\s+"))
          .flatMap(Arrays::stream)
          .collect(CacheCollectors.serializableCollector(() ->
                Collectors.groupingBy(Function.identity(), Collectors.counting())));
-
-//            .map((Serializable & Function<Map.Entry<String, String>, String[]>) e -> e.getValue().split("\\s+"))
-//            .flatMap((Serializable & Function<String[], Stream<String>>) Arrays::stream)
-//            .collect(CacheCollectors.serializableCollector(
-//                  () -> Collectors.groupingBy(Function.identity(), Collectors.counting())));
    }
 
    @SuppressWarnings("unchecked")

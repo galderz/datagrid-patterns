@@ -28,8 +28,9 @@ unzip $SERVER_ROOT/infinispan-server-9.0.0.CR3-bin.zip -d $SERVER_ROOT
 echo "Unzipped server"
 
 
-cp domain.xml $SERVER_HOME/domain/configuration
-cp host.xml $SERVER_HOME/domain/configuration
+cp server-config/domain/domain.xml $SERVER_HOME/domain/configuration
+cp server-config/domain/host.xml $SERVER_HOME/domain/configuration
+cp server-config/org.infinispan.main_module.xml $SERVER_HOME/modules/system/layers/base/org/infinispan/main/module.xml
 echo "Configuration files copied to server."
 
 
