@@ -2,7 +2,6 @@ package test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -12,6 +11,7 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 import org.infinispan.client.hotrod.marshall.ProtoStreamMarshaller;
+import org.infinispan.commons.util.Util;
 import org.infinispan.protostream.FileDescriptorSource;
 import org.infinispan.protostream.SerializationContext;
 import org.junit.Test;
@@ -33,15 +33,9 @@ public class WordCountTest {
       addLocalProtos(rcm);
 
       RemoteCache<Integer, Words> remote = rcm.getCache("text");
-      Words words1 = new Words();
-      words1.setWords("word1 word2 word3");
-      remote.put(1, words1);
-      Words words2 = new Words();
-      words2.setWords("word1 word2");
-      remote.put(2, words2);
-      Words words3 = new Words();
-      words3.setWords("word1");
-      remote.put(3, words3);
+      remote.put(1, new Words("word1 word2 word3"));
+      remote.put(2, new Words("word1 word2"));
+      remote.put(3, new Words("word1"));
 
       executeWordCount();
    }
@@ -67,7 +61,7 @@ public class WordCountTest {
 
    private void addLocalProtos(RemoteCacheManager rcm) throws IOException {
       RemoteCache<String, String> metaCache = rcm.getCache("___protobuf_metadata");
-      metaCache.put("words.proto", Words.proto());
+      metaCache.put("words.proto", Util.read(getClass().getResourceAsStream("/words.proto")));
       assertFalse(metaCache.containsKey(".errors"));
       SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(rcm);
       ctx.registerProtoFiles(FileDescriptorSource.fromResources("words.proto"));

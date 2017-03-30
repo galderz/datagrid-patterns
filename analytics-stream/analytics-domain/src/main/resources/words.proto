@@ -1,14 +1,7 @@
 package test;
 
-
-/**
- * @Indexed
- */
 message Words {
 
-   /**
-    * @Field(store = Store.YES)
-    */
    required string words = 1;
 
 }
