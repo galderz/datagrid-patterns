@@ -34,6 +34,10 @@ cp server-config/org.infinispan.main_module.xml $SERVER_HOME/modules/system/laye
 echo "Configuration files copied to server."
 
 
+$SERVER_HOME/bin/add-user.sh -u mgmt -p 'mypassword'
+echo "Admin user added."
+
+
 $SERVER_HOME/bin/domain.sh &
 
 

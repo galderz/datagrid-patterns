@@ -18,8 +18,6 @@ import javafx.stage.Stage;
  * Java FX application that stores station board information
  * and uses continuous query to keep a centralised dashboard
  * of all the delays happening.
- *
- * TODO: Remove train id duplicates from dashboard (show earliest?)
  */
 public final class FxApp extends Application {
 
@@ -51,6 +49,13 @@ public final class FxApp extends Application {
       SortedList<StationBoardView> sorted = new SortedList<>(
             task.getPartialResults(), StationBoardView.comparator());
       table.setItems(sorted);
+      task.exceptionProperty().addListener((observable, oldValue, newValue) ->  {
+         if(newValue != null) {
+            Exception ex = (Exception) newValue;
+            ex.printStackTrace();
+         }
+      });
+      
       exec.submit(task);
 
       stage.setOnCloseRequest(we -> {

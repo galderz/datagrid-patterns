@@ -21,46 +21,24 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-client-hotrod</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-remote-query-client</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.infinispan.protostream</groupId>
-      <artifactId>protostream</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>datagrid-patterns</groupId>
       <artifactId>analytics-domain</artifactId>
       <version>${project.version}</version>
     </dependency>
 
-    <!--
-        <dependency>
-          <groupId>org.infinispan</groupId>
-          <artifactId>infinispan-query-dsl</artifactId>
-          <version>${infinispan.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-client-hotrod</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-remote-query-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.infinispan.protostream</groupId>
+      <artifactId>protostream</artifactId>
+    </dependency>
 
-        <dependency>
-          <groupId>org.infinispan</groupId>
-          <artifactId>infinispan-remote-query-client</artifactId>
-          <version>${infinispan.version}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>com.googlecode.json-simple</groupId>
-          <artifactId>json-simple</artifactId>
-          <version>1.1.1</version>
-        </dependency>
-    -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 
+// TODO: Duplicate with analytics <- refactor when refactoring domain
 public class Gzip {
 
    public static Path gunzip(File from, File to) throws Exception {

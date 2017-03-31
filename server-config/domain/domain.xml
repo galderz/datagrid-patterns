@@ -72,6 +72,11 @@
                 <logger category="org.jboss.as.config">
                     <level name="DEBUG"/>
                 </logger>
+                <!-- MOD :: START :: add trace -->
+                <!--<logger category="org.infinispan">-->
+                    <!--<level name="TRACE"/>-->
+                <!--</logger>-->
+                <!-- MOD :: END -->
                 <logger category="sun.rmi">
                     <level name="WARN"/>
                 </logger>
@@ -138,7 +143,9 @@
                     <distributed-cache name="text">
                         <compatibility enabled="true" marshaller="org.infinispan.query.remote.CompatibilityProtoStreamMarshaller"/>
                     </distributed-cache>
-                    <distributed-cache name="delays-offline"/>
+                    <distributed-cache name="analytics">
+                        <compatibility enabled="true" marshaller="org.infinispan.query.remote.CompatibilityProtoStreamMarshaller"/>
+                    </distributed-cache>
                     <!-- MOD :: END -->
                 </cache-container>
             </subsystem>
@@ -331,10 +338,13 @@
     <server-groups>
         <server-group name="cluster" profile="clustered">
             <jvm name="default">
-                <heap size="64m" max-size="512m"/>
+                <!-- MOD :: START : adjust heap sizes-->
+                <heap size="128m" max-size="1024m"/>
+                <!-- MOD :: END -->
                 <!-- MOD :: START :: reduce jgroups join timeout from 5 sec to 1 sec -->
                 <jvm-options>
                     <option value="-Djgroups.join_timeout=1000"/>
+                    <option value="-XX:+HeapDumpOnOutOfMemoryError"/>
                 </jvm-options>
                 <!-- MOD :: END -->
             </jvm>
