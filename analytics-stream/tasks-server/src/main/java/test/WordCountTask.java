@@ -30,7 +30,7 @@ public class WordCountTask implements ServerTask {
       Cache<String, Words> cache = getCache();
 
       return cache.entrySet().stream()
-         .map(e -> e.getValue().words.split("\\s+"))
+         .map(e -> e.getValue().getWords().split("\\s+"))
          .flatMap(Arrays::stream)
          .collect(CacheCollectors.serializableCollector(() ->
                Collectors.groupingBy(Function.identity(), Collectors.counting())));

@@ -2,6 +2,6 @@ package test;
 
 message Words {
 
-   required string words = 1;
+   required bytes words = 1;
 
 }

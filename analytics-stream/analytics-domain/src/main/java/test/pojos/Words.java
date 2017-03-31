@@ -2,27 +2,36 @@ package test.pojos;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 import org.infinispan.protostream.MessageMarshaller;
 
 public class Words implements Serializable {
 
-   public final String words;
+   private final byte[] words;
 
-   public Words(String words) {
+   private Words(byte[] words) {
       this.words = words;
+   }
+
+   public String getWords() {
+      return new String(words, Charset.forName("UTF-8"));
+   }
+
+   public static Words make(String words) {
+      return new Words(words.getBytes(Charset.forName("UTF-8")));
    }
 
    public static class Marshaller implements MessageMarshaller<Words> {
 
       @Override
       public Words readFrom(ProtoStreamReader reader) throws IOException {
-         return new Words(reader.readString("words"));
+         return new Words(reader.readBytes("words"));
       }
 
       @Override
       public void writeTo(ProtoStreamWriter writer, Words words) throws IOException {
-         writer.writeString("words", words.words);
+         writer.writeBytes("words", words.words);
       }
 
       @Override

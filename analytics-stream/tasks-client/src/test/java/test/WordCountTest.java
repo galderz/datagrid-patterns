@@ -33,9 +33,9 @@ public class WordCountTest {
       addLocalProtos(rcm);
 
       RemoteCache<Integer, Words> remote = rcm.getCache("text");
-      remote.put(1, new Words("word1 word2 word3"));
-      remote.put(2, new Words("word1 word2"));
-      remote.put(3, new Words("word1"));
+      remote.put(1, Words.make("word1 word2 word3"));
+      remote.put(2, Words.make("word1 word2"));
+      remote.put(3, Words.make("word1"));
 
       executeWordCount();
    }
