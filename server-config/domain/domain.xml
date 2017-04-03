@@ -146,6 +146,9 @@
                     <distributed-cache name="analytics">
                         <compatibility enabled="true" marshaller="org.infinispan.query.remote.CompatibilityProtoStreamMarshaller"/>
                     </distributed-cache>
+                    <replicated-cache name="analytics-results">
+                        <compatibility enabled="true"/>
+                    </replicated-cache>
                     <!-- MOD :: END -->
                 </cache-container>
             </subsystem>
@@ -155,7 +158,9 @@
                 </hotrod-connector>
                 <memcached-connector socket-binding="memcached" cache-container="clustered"/>
                 <rest-connector socket-binding="rest" cache-container="clustered">
-                    <authentication security-realm="ApplicationRealm" auth-method="BASIC"/>
+                    <!-- MOD: START :: switch auth-method to NONE -->
+                    <authentication security-realm="ApplicationRealm" auth-method="NONE"/>
+                    <!-- MOD :: END -->
                 </rest-connector>
                 <websocket-connector socket-binding="websocket" cache-container="clustered"/>
             </subsystem>

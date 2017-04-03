@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ public class DelayRatioTask implements ServerTask {
                      c.setTime(e.departureTs);
                      return c.get(Calendar.HOUR_OF_DAY);
                   },
+                  TreeMap::new,
                   Collectors.counting()
             )));
 
@@ -57,6 +59,7 @@ public class DelayRatioTask implements ServerTask {
                            c.setTime(e.departureTs);
                            return c.get(Calendar.HOUR_OF_DAY);
                         },
+                        TreeMap::new,
                         Collectors.counting()
                   )));
 

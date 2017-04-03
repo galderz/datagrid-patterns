@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -167,6 +168,7 @@ public class EmbeddedAnalyticsTest {
                      c.setTime(e.departureTs);
                      return c.get(Calendar.HOUR_OF_DAY);
                   },
+                  TreeMap::new,
                   Collectors.counting()
             ));
 
@@ -181,6 +183,7 @@ public class EmbeddedAnalyticsTest {
                            c.setTime(e.departureTs);
                            return c.get(Calendar.HOUR_OF_DAY);
                         },
+                        TreeMap::new,
                         Collectors.counting()
                   ));
 

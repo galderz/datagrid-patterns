@@ -17,6 +17,7 @@ import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 import org.infinispan.client.hotrod.marshall.ProtoStreamMarshaller;
 import org.infinispan.protostream.FileDescriptorSource;
 import org.infinispan.protostream.SerializationContext;
+import org.json.simple.JSONObject;
 
 import delays.java.stream.pojos.StationBoardEntryAnalytics;
 import delays.java.stream.pojos.StopAnalytics;
@@ -37,8 +38,10 @@ public class AnalyticsApp {
       addLocalProtobuf(remote);
       inject(cache);
 
-      List<Map<Integer, Long>> result = execDelayedRatio();
-      System.out.println(result);
+      List<Map<Integer, Long>> results = execDelayedRatio();
+      System.out.println(results);
+
+      storeAsJson(results);
    }
 
    private static void addRemoteProtobuf() {
@@ -69,6 +72,30 @@ public class AnalyticsApp {
       } finally {
          rcm.stop();
       }
+   }
+
+   private static void storeAsJson(List<Map<Integer, Long>> results) {
+      ConfigurationBuilder builder = new ConfigurationBuilder();
+      builder.addServer()
+            .host("localhost")
+            .port(11322);
+      RemoteCacheManager client = new RemoteCacheManager(builder.build());
+      try {
+         RemoteCache<String, String> remote = client.getCache("analytics-results");
+
+         JSONObject json = new JSONObject();
+         json.put("delayed_per_hour", perHourJson(results.get(0)));
+         json.put("tot_per_hour", perHourJson(results.get(1)));
+
+         remote.put("results", json.toJSONString());
+      } finally {
+         client.stop();
+      }
+   }
+
+   private static JSONObject perHourJson(Map<Integer, Long> m) {
+      JSONObject json = new JSONObject(m);
+      return json;
    }
 
    private static void addLocalProtobuf(RemoteCacheManager rcm) throws IOException {
