@@ -93,7 +93,7 @@ public class FxTask extends Task<Void> {
 
       // TODO: Move protobuf code out
       RemoteCache<String, String> metaCache = remote.getCache(ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME);
-      metaCache.put("sbb.proto", Util.read(CliApp.class.getResourceAsStream("/sbb.proto")));
+      metaCache.put("sbb.proto", Util.read(FxTask.class.getResourceAsStream("/sbb.proto")));
       String errors = metaCache.get(ProtobufMetadataManagerConstants.ERRORS_KEY_SUFFIX);
       if (errors != null)
          throw new AssertionError("Error in proto file");

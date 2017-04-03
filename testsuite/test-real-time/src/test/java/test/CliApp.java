@@ -1,4 +1,4 @@
-package delays.query.continuous;
+package test;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -17,6 +17,7 @@ import org.infinispan.query.dsl.Query;
 import org.infinispan.query.dsl.QueryFactory;
 import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 
+import delays.query.continuous.Injector;
 import delays.query.continuous.pojos.GeoLoc;
 import delays.query.continuous.pojos.StationBoard;
 import delays.query.continuous.pojos.StationBoardEntry;

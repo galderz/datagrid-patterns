@@ -67,7 +67,7 @@ public class Injector {
    static Stop prevStop = null;
    static Date prevTs = null;
 
-   static Future<Void> cycle(RemoteCache<Stop, StationBoard> boards) throws Exception {
+   public static Future<Void> cycle(RemoteCache<Stop, StationBoard> boards) throws Exception {
       Path gunzipped = Gzip.gunzip(new File(GZIP_FILE_NAME), new File(GZIP_TARGET_FILE_NAME));
       return Executors.newSingleThreadExecutor().submit(() -> {
          System.out.println("Cycle...");
