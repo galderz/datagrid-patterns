@@ -1,6 +1,6 @@
 package delays.java.stream;
 
-import static java.lang.System.out;
+import static delays.java.stream.AnalyticsUtil.timed;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +8,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Map;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
@@ -36,7 +37,8 @@ public class AnalyticsApp {
       addLocalProtobuf(remote);
       inject(cache);
 
-      // TODO: Execute task to calculate delay ratio
+      List<Map<Integer, Long>> result = execDelayedRatio();
+      System.out.println(result);
    }
 
    private static void addRemoteProtobuf() {
@@ -48,6 +50,22 @@ public class AnalyticsApp {
       try {
          RemoteCache<String, StationBoardEntryAnalytics> remote = rcm.getCache("analytics");
          remote.execute("add-protobuf", Collections.emptyMap());
+      } finally {
+         rcm.stop();
+      }
+   }
+
+   private static List<Map<Integer, Long>> execDelayedRatio() {
+      ConfigurationBuilder builder = new ConfigurationBuilder();
+      builder.addServer()
+            .host("localhost")
+            .port(11322);
+      RemoteCacheManager rcm = new RemoteCacheManager(builder.build());
+      try {
+         RemoteCache<String, StationBoardEntryAnalytics> remote = rcm.getCache("analytics");
+         List<Map<Integer, Long>> result =
+               timed(() -> remote.execute("delay-ratio", Collections.emptyMap()), "calculate delayed ratio");
+         return result;
       } finally {
          rcm.stop();
       }
