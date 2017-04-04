@@ -1,4 +1,2 @@
 delays.java.stream.DelayRatioTask
 delays.java.stream.AddProtobufTask
-test.WordCountTask
-test.WordsProtoTask

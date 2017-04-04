@@ -38,6 +38,32 @@ It contains:
   * Time when the station board information was collected.
 
 
+# Analytics Demo
+
+## Testsuite
+
+`testsuite` folder contains several test projects that were developed to gain confidence in the analytics demo:
+
+* `EmbeddedAnalyticsTest` in `test-analytics-domain` is a standalone unit test. 
+It was created to verify that the statistics required for the analytics demo could be generated using Java Streams API and the application domain above.
+
+* `JsonViaHotRodTest` in `test-analytics-client` is a unit test that that relies on a server being available on a specific port (see test).
+This test also requires that the cache it interacts with has compatibility mode enabled. 
+The aim of this test is that the Infinispan RemoteCache API can be used to store a JSON formatted String and this can be retrieved via REST URL (see test for details). 
+
+### WordCountTest
+
+`WordCounTest` in `test-analytics-client` is a unit test that checks whether remote tasks relying on non-primitive objects work.
+Before running this test, it is necessary to deploy the task along with with POJOs.
+This can be done using the following commands:
+
+    $ cd testsuite
+    $ mvn clean install package -am -pl test-analytics-server
+    $ mvn wildfly:deploy -pl test-analytics-server
+
+Once the server task has been deployed, execute `WordCountTest`.
+
+
 # Real Time Demo
 
 The aim of the real-time demo is to show how to Infinispan's Continuous Query technology can be used to track changing data.
@@ -98,6 +124,15 @@ It starts three Infinispan Server instances forming a domain.
 The cache that the demo interacts with is defined as being distributed with 2 copies, so it can cope with 1 server going down and still keep all data.
 
 2. Execute `delays.query.continuous.FxApp` application.
+
+## Testsuite
+
+`testsuite/test-real-time` folder contains several standalone tests that were developed to gain confidence in the real-time demo.
+
+Some of these tests exercise JavaFX capabilities (e.g. `FxTest` and `FxTaskTest`) and hence it's recommended to run those and play with the interface exposed. 
+Other tests verify other aspects, such as basic remote continous queries, JSON parsing and GZIP'ing.
+
+Finally, a CLI version of the real-time demo is available which is not as dynamic as the JavaFX version.
 
 ## TODOS
 

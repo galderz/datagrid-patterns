@@ -17,6 +17,9 @@
   </properties>
 
   <modules>
+    <module>test-analytics-client</module>
+    <module>test-analytics-domain</module>
+    <module>test-analytics-server</module>
     <module>test-real-time</module>
   </modules>
 
