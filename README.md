@@ -6,6 +6,9 @@ This is a repository contaning example applications/demos on how to use Infinisp
 # Pre-requisites
 
 * Infinispan Server zip [file](http://infinispan.org/download/) version 9.0.0 or higher, located in a directory below this one.
+* Install Jupyter by installing [Anaconda](https://www.continuum.io/downloads).
+It is recommended that the Python 3.x version is installed.
+* Install [Node Version Manager](https://github.com/creationix/nvm) (NVM).
 
 
 # Application Domain
@@ -62,6 +65,27 @@ This can be done using the following commands:
     $ mvn wildfly:deploy -pl test-analytics-server
 
 Once the server task has been deployed, execute `WordCountTest`.
+
+### Jupyter Test
+
+`testsuite/test-jupyter` contains a test that verifies that a Jupyter notebook can retrieve data from a RESTful JSON endpoint. 
+
+Before running the test, it is necessary to execute the following installation steps.
+Go to the `test-jupyter` directory and install `json-server`:
+
+    $ cd testsuite/test-jupyter
+    $ nvm use 4.2
+    $ npm install json-server
+
+Once the installation steps are complete, start the JSON server with one of the test files provided:
+
+    $ ./node_modules/.bin/json-server --watch test_2000000.json
+    
+Start the Jupyer notebook:
+
+    $ ~/anaconda/bin/jupyter notebook
+
+From the Jupyter notebook, open open the `test-plot_2000000.ipynb` notebook and verify that all cells can be re-executed.
 
 
 # Real Time Demo
