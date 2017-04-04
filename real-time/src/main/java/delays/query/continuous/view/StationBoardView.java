@@ -107,7 +107,7 @@ public class StationBoardView {
 
       @Override
       public int compare(StationBoardView o1, StationBoardView o2) {
-         return o1.getDeparture().compareTo(o2.getDeparture());
+         return o2.getDeparture().compareTo(o1.getDeparture());
       }
 
    }
