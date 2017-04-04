@@ -1,5 +1,8 @@
 package delays.query.continuous;
 
+import static org.infinispan.query.remote.client.ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME;
+
+import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
@@ -38,12 +41,81 @@ public class FxTask extends Task<Void> {
    private Future<Void> injectorFuture;
    private ContinuousQuery<Station, StationBoard> continuousQuery;
    private RemoteCache<Station, StationBoard> stationBoards;
-   private RemoteCacheManager remote;
+   private RemoteCacheManager client;
 
    private BlockingQueue<StationBoardView> queue = new ArrayBlockingQueue<>(128);
 
    public final ObservableList<StationBoardView> getPartialResults() {
       return partialResults;
+   }
+
+   private void launchInjector() throws Exception {
+      ConfigurationBuilder builder = new ConfigurationBuilder();
+      builder.addServer()
+            .host("localhost")
+            .port(11322)
+            .marshaller(new ProtoStreamMarshaller());
+
+      client = new RemoteCacheManager(builder.build());
+      stationBoards = client.getCache("default");
+      stationBoards.clear();
+
+      sendProtoDescriptorToServer(client.getCache(PROTOBUF_METADATA_CACHE_NAME));
+      addProtoDescriptorAndMarshallersToClient(client);
+
+      injectorFuture = Injector.cycle(stationBoards);
+      QueryFactory qf = Search.getQueryFactory(stationBoards);
+      Query query = qf.from(StationBoard.class)
+            .having("entries.delayMin").gt(0L)
+            .build();
+
+      ContinuousQueryListener<Station, StationBoard> listener =
+            new ContinuousQueryListener<Station, StationBoard>() {
+         @Override
+         public void resultJoining(Station key, StationBoard value) {
+            value.entries.stream()
+               .filter(e -> e.delayMin > 0)
+               .forEach(e -> {
+                  //System.out.println(e);
+                  queue.add(new StationBoardView(
+                        e.train.cat,
+                        String.format("%tR", e.departureTs),
+                        key.name,
+                        e.train.to,
+                        "+" + e.delayMin,
+                        e.train.name
+                  ));
+               });
+         }
+
+         @Override
+         public void resultUpdated(Station key, StationBoard value) {
+         }
+
+         @Override
+         public void resultLeaving(Station key) {
+         }
+      };
+
+      continuousQuery = Search.getContinuousQuery(stationBoards);
+      continuousQuery.addContinuousQueryListener(query, listener);
+   }
+
+   private void sendProtoDescriptorToServer(RemoteCache<String, String> metaCache) throws IOException {
+      metaCache.put("real-time.proto", Util.read(FxTask.class.getResourceAsStream("/real-time.proto")));
+      String errors = metaCache.get(ProtobufMetadataManagerConstants.ERRORS_KEY_SUFFIX);
+      if (errors != null)
+         throw new AssertionError("Error in proto file");
+   }
+
+   private void addProtoDescriptorAndMarshallersToClient(RemoteCacheManager client) throws IOException {
+      SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(client);
+      ctx.registerProtoFiles(FileDescriptorSource.fromResources("real-time.proto"));
+      ctx.registerMarshaller(new GeoLoc.Marshaller());
+      ctx.registerMarshaller(new StationBoard.Marshaller());
+      ctx.registerMarshaller(new Stop.Marshaller());
+      ctx.registerMarshaller(new Station.Marshaller());
+      ctx.registerMarshaller(new Train.Marshaller());
    }
 
    @Override
@@ -74,73 +146,10 @@ public class FxTask extends Task<Void> {
       if (stationBoards != null)
          stationBoards.clear();;
 
-      if (remote != null)
-         remote.stop();
+      if (client != null)
+         client.stop();
 
       System.out.println("Cancelled task.");
-   }
-
-   private void launchInjector() throws Exception {
-      ConfigurationBuilder builder = new ConfigurationBuilder();
-      builder.addServer()
-            .host("localhost")
-            .port(11322)
-            .marshaller(new ProtoStreamMarshaller());
-
-      remote = new RemoteCacheManager(builder.build());
-      stationBoards = remote.getCache("default");
-      stationBoards.clear();
-
-      // TODO: Move protobuf code out
-      RemoteCache<String, String> metaCache = remote.getCache(ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME);
-      metaCache.put("real-time.proto", Util.read(FxTask.class.getResourceAsStream("/real-time.proto")));
-      String errors = metaCache.get(ProtobufMetadataManagerConstants.ERRORS_KEY_SUFFIX);
-      if (errors != null)
-         throw new AssertionError("Error in proto file");
-
-      SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(remote);
-      ctx.registerProtoFiles(FileDescriptorSource.fromResources("real-time.proto"));
-      ctx.registerMarshaller(new GeoLoc.Marshaller());
-      ctx.registerMarshaller(new StationBoard.Marshaller());
-      ctx.registerMarshaller(new Stop.Marshaller());
-      ctx.registerMarshaller(new Station.Marshaller());
-      ctx.registerMarshaller(new Train.Marshaller());
-
-      injectorFuture = Injector.cycle(stationBoards);
-      QueryFactory qf = Search.getQueryFactory(stationBoards);
-      Query query = qf.from(StationBoard.class)
-            .having("entries.delayMin").gt(0L)
-            .build();
-
-      ContinuousQueryListener<Station, StationBoard> listener = new ContinuousQueryListener<Station, StationBoard>() {
-         @Override
-         public void resultJoining(Station key, StationBoard value) {
-            value.entries.stream()
-                  .filter(e -> e.delayMin > 0)
-                  .forEach(e -> {
-                     //System.out.println(e);
-                     queue.add(new StationBoardView(
-                           e.train.cat,
-                           String.format("%tR", e.departureTs),
-                           key.name,
-                           e.train.to,
-                           "+" + e.delayMin,
-                           e.train.name
-                     ));
-                  });
-         }
-
-         @Override
-         public void resultUpdated(Station key, StationBoard value) {
-         }
-
-         @Override
-         public void resultLeaving(Station key) {
-         }
-      };
-
-      continuousQuery = Search.getContinuousQuery(stationBoards);
-      continuousQuery.addContinuousQueryListener(query, listener);
    }
 
 }

@@ -43,6 +43,60 @@ It contains:
 
 # Real Time Demo
 
-1. Execute `run-servers.sh`
+The aim of the real-time demo is to show how to Infinispan's Continuous Query technology can be used to track changing data.
+Initially, continuous Query involves defining an query and a listener implementation.
+When the query is executed, any matching data gets passed in to the listener implementation as part of the joining result set.
+As more data is added or removed, the listener gets invoked with any new matches, or matches that are no longer part of the result set.
+
+For this demo, a remote cache is defined as: 
+
+    RemoteCache<Station, StationBoard> stationBoards...
+
+The aim is for the remote cache to track each station's station board state at a given time.
+
+Remote querying uses protocol buffers as common format for being able to deconstruct binary data.
+So, once the remote cache has been defined, the following steps are required before the query can be defined:
+
+* For each type stored, declare it as a protocol buffers message type in a `.proto` file.
+* Store the `.proto` file in the Infinispan Server's protobuf metadata cache.
+* Store `.proto` file and a marshaller for each of the message types in the client. 
+ 
+Next, a query is defined as matching any station boards where at least one of the train stops is delayed:
+
+    QueryFactory qf = Search.getQueryFactory(stationBoards);
+    Query query = qf.from(StationBoard.class)
+        .having("entries.delayMin").gt(0L)
+        .build();
+
+Once the query is defined, a continuous query listener is attached to it:
+
+      ContinuousQueryListener<Station, StationBoard> listener = new ContinuousQueryListener<Station, StationBoard>() {
+         @Override
+         public void resultJoining(Station key, StationBoard value) {
+            // ...
+         }
+
+         @Override
+         public void resultUpdated(Station key, StationBoard value) {
+            // ...
+         }
+
+         @Override
+         public void resultLeaving(Station key) {
+            // ... 
+         }
+      };
+
+      continuousQuery = Search.getContinuousQuery(stationBoards);
+      continuousQuery.addContinuousQueryListener(query, listener);
+
+When the demo application runs, it cycles through some cached station board data and injects that information to the remote cache.
+As data gets updated and delayed station board entries are found, these are presented in a JavaFX based table.  
+
+## Running Real Time Demo
+
+1. Execute `run-servers.sh`. 
+It starts three Infinispan Server instances forming a domain.
+The cache that the demo interacts with is defined as being distributed with 2 copies, so it can cope with 1 server going down and still keep all data.
 
 2. Execute `delays.query.continuous.FxApp` application.
