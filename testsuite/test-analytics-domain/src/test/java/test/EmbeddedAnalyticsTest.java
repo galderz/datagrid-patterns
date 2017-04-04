@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -22,9 +21,9 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.junit.Test;
 
-import delays.java.stream.pojos.StationBoardEntryAnalytics;
-import delays.java.stream.pojos.StopAnalytics;
-import delays.java.stream.pojos.TrainAnalytics;
+import delays.java.stream.pojos.Stop;
+import delays.java.stream.pojos.Station;
+import delays.java.stream.pojos.Train;
 
 public class EmbeddedAnalyticsTest {
 
@@ -118,7 +117,7 @@ public class EmbeddedAnalyticsTest {
    public void testEmbeddedAnalytics() throws IOException {
       EmbeddedCacheManager manager = new DefaultCacheManager();
       manager.defineConfiguration("local", new ConfigurationBuilder().build());
-      Cache<String, StationBoardEntryAnalytics> cache = manager.getCache("local");
+      Cache<String, Stop> cache = manager.getCache("local");
 
       final String file = "src/test/resources/station-boards-dump_2000.tsv";
       try (Stream<String> lines = Files.lines(Paths.get(file))) {
@@ -139,16 +138,10 @@ public class EmbeddedAnalyticsTest {
                String capacity1st = parts[10];
                String capacity2nd = parts[11];
 
-               TrainAnalytics train = TrainAnalytics.make(trainName, trainTo, trainCat, trainOperator);
-               StopAnalytics stop = StopAnalytics.make(stopId, stopName);
-               StationBoardEntryAnalytics entry = StationBoardEntryAnalytics.make(
-                  train, departureTs, null, null, delayMin, stop, entryTs, capacity1st, capacity2nd);
-
-//               StationBoardEntryAnalytics prev = cache.get(id);
-//               if (prev != null) {
-//                  System.out.println("Prev   : " + prev);
-//                  System.out.println("Current: " + entry);
-//               }
+               Train train = Train.make(trainName, trainTo, trainCat, trainOperator);
+               Station station = Station.make(stopId, stopName);
+               Stop entry = Stop.make(
+                  train, departureTs, null, null, delayMin, station, entryTs, capacity1st, capacity2nd);
 
                // By keeping data per id, duplicates for each id are avoided
                // Since data is kept in order of capturing, it does not mean

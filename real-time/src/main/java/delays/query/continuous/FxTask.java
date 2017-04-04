@@ -60,8 +60,9 @@ public class FxTask extends Task<Void> {
       stationBoards = client.getCache("default");
       stationBoards.clear();
 
-      sendProtoDescriptorToServer(client.getCache(PROTOBUF_METADATA_CACHE_NAME));
-      addProtoDescriptorAndMarshallersToClient(client);
+      addProtoDescriptorToServer(client.getCache(PROTOBUF_METADATA_CACHE_NAME));
+      addProtoDescriptorToClient(client);
+      addProtoMarshallersToClient(client);
 
       injectorFuture = Injector.cycle(stationBoards);
       QueryFactory qf = Search.getQueryFactory(stationBoards);
@@ -101,16 +102,21 @@ public class FxTask extends Task<Void> {
       continuousQuery.addContinuousQueryListener(query, listener);
    }
 
-   private void sendProtoDescriptorToServer(RemoteCache<String, String> metaCache) throws IOException {
+   private void addProtoDescriptorToServer(RemoteCache<String, String> metaCache) throws IOException {
       metaCache.put("real-time.proto", Util.read(FxTask.class.getResourceAsStream("/real-time.proto")));
       String errors = metaCache.get(ProtobufMetadataManagerConstants.ERRORS_KEY_SUFFIX);
       if (errors != null)
          throw new AssertionError("Error in proto file");
    }
 
-   private void addProtoDescriptorAndMarshallersToClient(RemoteCacheManager client) throws IOException {
+   private SerializationContext addProtoDescriptorToClient(RemoteCacheManager client) throws IOException {
       SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(client);
       ctx.registerProtoFiles(FileDescriptorSource.fromResources("real-time.proto"));
+      return ctx;
+   }
+
+   private void addProtoMarshallersToClient(RemoteCacheManager client) throws IOException {
+      SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(client);
       ctx.registerMarshaller(new GeoLoc.Marshaller());
       ctx.registerMarshaller(new StationBoard.Marshaller());
       ctx.registerMarshaller(new Stop.Marshaller());

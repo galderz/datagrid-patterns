@@ -43,6 +43,62 @@ It contains:
 
 # Analytics Demo
 
+The aim of the analytics demo is to show how to use Infinispan extensions to Java Streams to run distributed computations.
+One of the new features introduced in Infinispan 8 was distributed streams, which enhances Java Stream capabilities to run on a distributed cache.
+The key aspect of these enhancements is that instead of moving around data to do any processing, Infinispan moves the functions or lambdas around the cluster so that they are executed against local data.
+
+This is a very powerful feature since it enables Java developers to use familiar Java Streams API to do distributed computing.
+This demo shows how Infinispan distributed streams can be used against remotely against cluster of Infinispan servers.
+
+The final objective of the demo is to use historic data of train station board information to answer this question: 
+
+> What is the time of the day when there is the biggest ratio of delayed trains?
+
+To help answer this question, a remote cache is defined to contain historic information of all train stops keyed by train id:  
+
+    RemoteCache<String, Stop>
+    
+*Note: A train goes through multiple stations and hence it has multiple stops.
+For simplicity, only the last stop in terms of time is kept*
+
+This demo uses protocol buffers to describe the types involved in the demo so that they can be unmarshalled remotely in the server.
+This is necessary so that the remote server task can work with user types as opposed to binary data.
+This means that when the demo starts, there are a few set up invocations:
+
+* ...
+
+
+it will store the historic data which in this case it's 3 week's worth of data.
+Once the data is loaded 
+
+## Running Demo
+
+Starts the serves by executing:
+
+    $ ./run-servers.sh 
+
+It starts three Infinispan Server instances forming a domain.
+Details about the configuration can be found in the reference section.
+
+Next, deploy the server tasks in the Infinispan servers.
+The first task deployed registers the protobuf marshallers that convert from binary to user types.
+The second tasks is the task that will calculate the ratio of delayed trains across the day.
+
+    $ cd analytics
+    $ mvn clean install package -am -pl analytics-server
+    $ mvn wildfly:deploy -pl analytics-server
+
+Then, run the data injector and calculate the ratio of delayed trains across the day by executing `delays.java.stream.AnalyticsApp` class.
+
+Once the data injector and the delayed trains ratio has been calculated, start the Jupyter notebook:
+
+    $ cd analytics/analytics-jupyter
+    $ ~/anaconda/bin/jupyter notebook
+
+Open `delayed-trains-ratio.ipynb` notebook and verify that each cell calculates without an error. 
+The result should show that 2am is the time of the day when there is the biggest ratio of delayed trains.
+
+
 ## Testsuite
 
 `testsuite` folder contains several test projects that were developed to gain confidence in the analytics demo:
@@ -87,6 +143,26 @@ Start the Jupyer notebook:
 
 From the Jupyter notebook, open open the `test-plot_2000000.ipynb` notebook and verify that all cells can be re-executed.
 
+## Reference
+
+### Server Configuration Explained
+
+This section explains the tweaks that have been applied to the server configuration to run the analytics demo.
+These changes are already automated through the `run-servers.sh` execution, and hence the user is not required to apply them manually to run the demo.
+However, it's important for the reader to be aware of them in case wanting to replicate the demo somewhere else.
+
+To run the distributed streams computation server side, the demo will execute a remote server task in one of the Infinispan servers.
+Given that this remote server task requires accessing `Stop` type, which is a non-primitive type, there are some extra tweaks required in the server.
+
+By default, remote caches store information in binary format in the server.
+However, to be able to access data in non-binary format from the remote server task, it is necessary for the binary data to be unmarshalled server-side.
+To do that, this demo takes advantage of Infinispan's support for types to be defined via protobuf schemas. 
+For types to be unmarshalled using protobuf schemas, it's necessary for a cache's compatibility marshaller to be set to `org.infinispan.query.remote.CompatibilityProtoStreamMarshaller`. 
+
+To be able to do that's it's necessary to add modify `$SERVER_HOME//modules/system/layers/base/org/infinispan/main/module.xml` file and add an extra module dependency:  
+
+    <module name="org.infinispan.remote-query.server" optional="true"/>
+
 
 # Real Time Demo
 
@@ -99,7 +175,8 @@ For this demo, a remote cache is defined as:
 
     RemoteCache<Station, StationBoard> stationBoards...
 
-The aim is for the remote cache to track each station's station board state at a given time.
+The final objective of the demo is to present a live-updating table of delayed trains.
+To help achieve this objective, a remote cache should be populated with each station's upcoming train board information at a given time.
 
 Remote querying uses protocol buffers as common format for being able to deconstruct binary data.
 So, once the remote cache has been defined, the following steps are required before the query can be defined:
@@ -143,11 +220,14 @@ As data gets updated and delayed station board entries are found, these are pres
 
 ## Running Demo
 
-1. Execute `run-servers.sh`. 
+Starts the serves by executing:
+
+    $ ./run-servers.sh 
+
 It starts three Infinispan Server instances forming a domain.
 The cache that the demo interacts with is defined as being distributed with 2 copies, so it can cope with 1 server going down and still keep all data.
 
-2. Execute `delays.query.continuous.FxApp` application.
+Next, execute `delays.query.continuous.FxApp` application.
 
 ## Testsuite
 
