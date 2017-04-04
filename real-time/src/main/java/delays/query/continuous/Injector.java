@@ -26,8 +26,8 @@ import org.json.simple.parser.JSONParser;
 
 import delays.query.continuous.pojos.GeoLoc;
 import delays.query.continuous.pojos.StationBoard;
-import delays.query.continuous.pojos.StationBoardEntry;
 import delays.query.continuous.pojos.Stop;
+import delays.query.continuous.pojos.Station;
 import delays.query.continuous.pojos.Train;
 import delays.query.continuous.util.Gzip;
 
@@ -42,7 +42,7 @@ public class Injector {
 
    static final int SPEEDUP = 10;
 
-   static Map.Entry<Stop, StationBoard> headStationBoard() throws IOException {
+   static Map.Entry<Station, StationBoard> headStationBoard() throws IOException {
       try (Stream<String> lines = Files.lines(Paths.get(FILE_NAME))) {
          String entry = lines.findFirst().get();
 
@@ -52,66 +52,71 @@ public class Injector {
          JSONObject jsonStop = (JSONObject) json.get("stop");
          JSONObject jsonSt = (JSONObject) jsonStop.get("station");
 
-         Stop stop = mkStop(jsonSt);
+         Station station = mkStop(jsonSt);
 
          Date ts = new Date((long) json.get("timeStamp"));
-         StationBoardEntry boardEntry = mkStationBoardEntry(json, jsonStop);
+         Stop boardEntry = mkStationBoardEntry(json, jsonStop);
          StationBoard board = new StationBoard(ts, Arrays.asList(boardEntry));
 
-         Map<Stop, StationBoard> map = new HashMap<>();
-         map.put(stop, board);
+         Map<Station, StationBoard> map = new HashMap<>();
+         map.put(station, board);
          return map.entrySet().iterator().next();
       }
    }
 
-   static Stop prevStop = null;
+   static Station prevStation = null;
    static Date prevTs = null;
 
-   public static Future<Void> cycle(RemoteCache<Stop, StationBoard> boards) throws Exception {
+   public static Future<Void> cycle(RemoteCache<Station, StationBoard> boards) throws Exception {
       Path gunzipped = Gzip.gunzip(new File(GZIP_FILE_NAME), new File(GZIP_TARGET_FILE_NAME));
       return Executors.newSingleThreadExecutor().submit(() -> {
-         System.out.println("Cycle...");
-         doCycle(boards, gunzipped);
-         return null;
+         try {
+            System.out.println("Cycle...");
+            doCycle(boards, gunzipped);
+            return null;
+         } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+         }
       });
    }
 
-   private static void doCycle(RemoteCache<Stop, StationBoard> boards, Path gunzipped) throws Exception {
+   private static void doCycle(RemoteCache<Station, StationBoard> boards, Path gunzipped) throws Exception {
       try (Stream<String> lines = Files.lines(gunzipped)) {
-         // TODO: Group by...
          JSONParser parser = new JSONParser();
-         List<StationBoardEntry> boardEntries = new ArrayList<>();
+         List<Stop> boardEntries = new ArrayList<>();
          lines.forEach(l -> {
             JSONObject json = (JSONObject) s(() -> parser.parse(l));
             JSONObject jsonStop = (JSONObject) json.get("stop");
             JSONObject jsonSt = (JSONObject) jsonStop.get("station");
 
-            Stop stop = mkStop(jsonSt);
+            Station station = mkStop(jsonSt);
             Date ts = new Date((long) json.get("timeStamp"));
-            StationBoardEntry boardEntry = mkStationBoardEntry(json, jsonStop);
+            Stop boardEntry = mkStationBoardEntry(json, jsonStop);
 
-            if (prevStop == null)
-               prevStop = stop;
+            if (prevStation == null)
+               prevStation = station;
 
             if (prevTs == null)
                prevTs = ts;
 
-            if (prevStop.equals(stop) && prevTs.equals(ts)) {
+            if (prevStation.equals(station) && prevTs.equals(ts)) {
                boardEntries.add(boardEntry);
             } else {
                long diff = dateDiff(prevTs, ts, TimeUnit.MILLISECONDS);
                if (diff > 0)
                   r(() -> Thread.sleep(diff / SPEEDUP));
 
-               boards.put(prevStop, new StationBoard(prevTs, boardEntries));
+               //System.out.println("Put: " + prevStation + ", with: " + new StationBoard(prevTs, boardEntries));
+               boards.put(prevStation, new StationBoard(prevTs, boardEntries));
                boardEntries.clear();
                boardEntries.add(boardEntry);
-               prevStop = stop;
+               prevStation = station;
                prevTs = ts;
             }
          });
          // Store last board
-         boards.put(prevStop, new StationBoard(prevTs, boardEntries));
+         boards.put(prevStation, new StationBoard(prevTs, boardEntries));
       }
    }
 
@@ -120,13 +125,13 @@ public class Injector {
       return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
    }
 
-   private static StationBoardEntry mkStationBoardEntry(JSONObject json, JSONObject jsonStop) {
+   private static Stop mkStationBoardEntry(JSONObject json, JSONObject jsonStop) {
       Train train = mkTrain(json, jsonStop);
       Date departureTs = new Date((long) jsonStop.get("departureTimestamp") * 1000);
       String platform = (String) jsonStop.get("platform");
       Object arrivalSt = jsonStop.get("arrivalTimestamp");
       Object delayMin = jsonStop.get("delay");
-      return new StationBoardEntry(
+      return new Stop(
             train, departureTs, platform, orNull(arrivalSt), orNull(delayMin, 0L));
    }
 
@@ -149,11 +154,11 @@ public class Injector {
       return new Train(id, trName, to, cat);
    }
 
-   private static Stop mkStop(JSONObject station) {
+   private static Station mkStop(JSONObject station) {
       long id = Long.parseLong((String) station.get("id"));
       String name = (String) station.get("name");
       GeoLoc geoLoc = mkGeoLoc(station);
-      return new Stop(id, name, geoLoc);
+      return new Station(id, name, geoLoc);
    }
 
    private static GeoLoc mkGeoLoc(JSONObject station) {

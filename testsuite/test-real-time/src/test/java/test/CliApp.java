@@ -20,8 +20,8 @@ import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 import delays.query.continuous.Injector;
 import delays.query.continuous.pojos.GeoLoc;
 import delays.query.continuous.pojos.StationBoard;
-import delays.query.continuous.pojos.StationBoardEntry;
 import delays.query.continuous.pojos.Stop;
+import delays.query.continuous.pojos.Station;
 import delays.query.continuous.pojos.Train;
 
 /**
@@ -30,8 +30,8 @@ import delays.query.continuous.pojos.Train;
  */
 public class CliApp {
 
-    private static RemoteCache<Stop, StationBoard> boards;
-    private static ContinuousQuery<Stop, StationBoard> continuousQuery;
+    private static RemoteCache<Station, StationBoard> boards;
+    private static ContinuousQuery<Station, StationBoard> continuousQuery;
 
     public static void main( String[] args ) throws Exception {
         Runtime.getRuntime().addShutdownHook(new Cleanup());
@@ -55,8 +55,8 @@ public class CliApp {
             registerProtoFiles(ctx);
             ctx.registerMarshaller(new GeoLoc.Marshaller());
             ctx.registerMarshaller(new StationBoard.Marshaller());
-            ctx.registerMarshaller(new StationBoardEntry.Marshaller());
             ctx.registerMarshaller(new Stop.Marshaller());
+            ctx.registerMarshaller(new Station.Marshaller());
             ctx.registerMarshaller(new Train.Marshaller());
 
             Future<Void> cycleFuture = Injector.cycle(boards);
@@ -72,9 +72,9 @@ public class CliApp {
             System.out.format(titleFormat, "----", "---------", "------------------------", "------------------------", "-----", "-----------");
             System.out.format(titleFormat, "Type", "Departure", "Station",                   "Destination",             "Delay", "Train Name");
             System.out.format(titleFormat, "----", "---------", "------------------------", "------------------------", "-----", "-----------");
-            ContinuousQueryListener<Stop, StationBoard> listener = new ContinuousQueryListener<Stop, StationBoard>() {
+            ContinuousQueryListener<Station, StationBoard> listener = new ContinuousQueryListener<Station, StationBoard>() {
                 @Override
-                public void resultJoining(Stop key, StationBoard value) {
+                public void resultJoining(Station key, StationBoard value) {
                     value.getEntries().stream()
                           .filter(e -> e.getDelayMin() > 0)
                           .forEach(e -> {
@@ -89,12 +89,12 @@ public class CliApp {
                 }
 
                 @Override
-                public void resultUpdated(Stop key, StationBoard value) {
+                public void resultUpdated(Station key, StationBoard value) {
                     // TODO...
                 }
 
                 @Override
-                public void resultLeaving(Stop key) {
+                public void resultLeaving(Station key) {
                     // TODO...
                 }
             };

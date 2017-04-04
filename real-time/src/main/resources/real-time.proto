@@ -1,9 +1,9 @@
-package sbb;
+package real_time;
 
 /**
  * @Indexed
  */
-message Stop {
+message Station {
 
     /**
      * @Field(store = Store.YES)
@@ -40,14 +40,14 @@ message StationBoard {
     /**
      * @Field(store = Store.YES)
      */
-    repeated StationBoardEntry entries = 2;  // repeated cannot be required
+    repeated Stop entries = 2;  // repeated cannot be required
 
 }
 
 /**
  * @Indexed
  */
-message StationBoardEntry {
+message Stop {
 
     /**
      * @Field(store = Store.YES)

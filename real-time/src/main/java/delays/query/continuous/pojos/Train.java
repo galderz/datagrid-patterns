@@ -6,47 +6,15 @@ import org.infinispan.protostream.MessageMarshaller;
 
 public class Train {
 
-   private String id;
-   private String name;
-   private String to;
-   private String cat;
+   public final String id;
+   public final String name;
+   public final String to;
+   public final String cat;
 
    public Train(String id, String name, String to, String cat) {
       this.id = id;
       this.name = name;
       this.to = to;
-      this.cat = cat;
-   }
-
-   public String getId() {
-      return id;
-   }
-
-   public void setId(String id) {
-      this.id = id;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
-   }
-
-   public String getTo() {
-      return to;
-   }
-
-   public void setTo(String to) {
-      this.to = to;
-   }
-
-   public String getCat() {
-      return cat;
-   }
-
-   public void setCat(String cat) {
       this.cat = cat;
    }
 
@@ -95,10 +63,10 @@ public class Train {
 
       @Override
       public void writeTo(ProtoStreamWriter writer, Train train) throws IOException {
-         writer.writeString("id", train.getId());
-         writer.writeString("name", train.getName());
-         writer.writeString("to", train.getTo());
-         writer.writeString("cat", train.getCat());
+         writer.writeString("id", train.id);
+         writer.writeString("name", train.name);
+         writer.writeString("to", train.to);
+         writer.writeString("cat", train.cat);
       }
 
       @Override
@@ -108,7 +76,7 @@ public class Train {
 
       @Override
       public String getTypeName() {
-         return "sbb.Train";
+         return "real_time.Train";
       }
 
    }

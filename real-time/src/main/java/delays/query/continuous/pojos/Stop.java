@@ -1,52 +1,35 @@
 package delays.query.continuous.pojos;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.infinispan.protostream.MessageMarshaller;
 
-// TODO: Rename to Station
 public class Stop {
 
-   private long id;
-   private String name;
-   private GeoLoc loc;
+   public final Train train;
+   public final Date departureTs;
+   public final String platform;
+   public final Long delayMin;
 
-   public Stop(long id, String name, GeoLoc loc) {
-      this.id = id;
-      this.name = name;
-      this.loc = loc;
-   }
+   private Date arrivalTs; // nullable
 
-   public long getId() {
-      return id;
-   }
-
-   public void setId(long id) {
-      this.id = id;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
-   }
-
-   public GeoLoc getLoc() {
-      return loc;
-   }
-
-   public void setLoc(GeoLoc loc) {
-      this.loc = loc;
+   public Stop(Train train, Date departureTs, String platform, Date arrivalTs, Long delayMin) {
+      this.train = train;
+      this.departureTs = departureTs;
+      this.platform = platform;
+      this.arrivalTs = arrivalTs;
+      this.delayMin = delayMin;
    }
 
    @Override
    public String toString() {
       return "Stop{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", loc=" + loc +
+            "train=" + train +
+            ", departureTs=" + departureTs +
+            ", platform='" + platform + '\'' +
+            ", arrivalTs=" + arrivalTs +
+            ", delayMin=" + delayMin +
             '}';
    }
 
@@ -55,18 +38,22 @@ public class Stop {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
 
-      Stop stop = (Stop) o;
+      Stop that = (Stop) o;
 
-      if (id != stop.id) return false;
-      if (!name.equals(stop.name)) return false;
-      return loc.equals(stop.loc);
+      if (!train.equals(that.train)) return false;
+      if (!departureTs.equals(that.departureTs)) return false;
+      if (!platform.equals(that.platform)) return false;
+      if (!delayMin.equals(that.delayMin)) return false;
+      return arrivalTs != null ? arrivalTs.equals(that.arrivalTs) : that.arrivalTs == null;
    }
 
    @Override
    public int hashCode() {
-      int result = (int) (id ^ (id >>> 32));
-      result = 31 * result + name.hashCode();
-      result = 31 * result + loc.hashCode();
+      int result = train.hashCode();
+      result = 31 * result + departureTs.hashCode();
+      result = 31 * result + platform.hashCode();
+      result = 31 * result + delayMin.hashCode();
+      result = 31 * result + (arrivalTs != null ? arrivalTs.hashCode() : 0);
       return result;
    }
 
@@ -74,17 +61,21 @@ public class Stop {
 
       @Override
       public Stop readFrom(ProtoStreamReader reader) throws IOException {
-         long id = reader.readLong("id");
-         String name = reader.readString("name");
-         GeoLoc location = reader.readObject("loc", GeoLoc.class);
-         return new Stop(id, name, location);
+         Train train = reader.readObject("train", Train.class);
+         Date departureTs = reader.readDate("departureTs");
+         String platform = reader.readString("platform");
+         Date arrivalTs = reader.readDate("arrivalTs");
+         Long delayMin = reader.readLong("delayMin");
+         return new Stop(train, departureTs, platform, arrivalTs, delayMin);
       }
 
       @Override
-      public void writeTo(ProtoStreamWriter writer, Stop stop) throws IOException {
-         writer.writeLong("id", stop.getId());
-         writer.writeString("name", stop.getName());
-         writer.writeObject("loc", stop.getLoc(), GeoLoc.class);
+      public void writeTo(ProtoStreamWriter writer, Stop entry) throws IOException {
+         writer.writeObject("train", entry.train, Train.class);
+         writer.writeDate("departureTs", entry.departureTs);
+         writer.writeString("platform", entry.platform);
+         writer.writeDate("arrivalTs", entry.arrivalTs);
+         writer.writeLong("delayMin", entry.delayMin);
       }
 
       @Override
@@ -94,7 +85,7 @@ public class Stop {
 
       @Override
       public String getTypeName() {
-         return "sbb.Stop";
+         return "real_time.Stop";
       }
 
    }

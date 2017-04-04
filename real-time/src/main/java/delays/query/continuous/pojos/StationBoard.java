@@ -9,10 +9,10 @@ import org.infinispan.protostream.MessageMarshaller;
 
 public class StationBoard {
 
-   private Date ts;
-   private List<StationBoardEntry> entries;
+   public final Date ts;
+   public final List<Stop> entries;
 
-   public StationBoard(Date timestamp, List<StationBoardEntry> entries) {
+   public StationBoard(Date timestamp, List<Stop> entries) {
       this.ts = timestamp;
       this.entries = entries;
    }
@@ -21,16 +21,8 @@ public class StationBoard {
       return ts;
    }
 
-   public void setTs(Date ts) {
-      this.ts = ts;
-   }
-
-   public List<StationBoardEntry> getEntries() {
+   public List<Stop> getEntries() {
       return entries;
-   }
-
-   public void setEntries(List<StationBoardEntry> entries) {
-      this.entries = entries;
    }
 
    @Override
@@ -64,15 +56,15 @@ public class StationBoard {
       @Override
       public StationBoard readFrom(ProtoStreamReader reader) throws IOException {
          Date ts = reader.readDate("ts");
-         List<StationBoardEntry> entries = reader
-               .readCollection("entries", new ArrayList<>(), StationBoardEntry.class);
+         List<Stop> entries = reader
+               .readCollection("entries", new ArrayList<>(), Stop.class);
          return new StationBoard(ts, entries);
       }
 
       @Override
       public void writeTo(ProtoStreamWriter writer, StationBoard stationBoard) throws IOException {
-         writer.writeDate("ts", stationBoard.getTs());
-         writer.writeCollection("entries", stationBoard.getEntries(), StationBoardEntry.class);
+         writer.writeDate("ts", stationBoard.ts);
+         writer.writeCollection("entries", stationBoard.entries, Stop.class);
       }
 
       @Override
@@ -82,7 +74,7 @@ public class StationBoard {
 
       @Override
       public String getTypeName() {
-         return "sbb.StationBoard";
+         return "real_time.StationBoard";
       }
 
    }

@@ -21,8 +21,8 @@ import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 
 import delays.query.continuous.pojos.GeoLoc;
 import delays.query.continuous.pojos.StationBoard;
-import delays.query.continuous.pojos.StationBoardEntry;
 import delays.query.continuous.pojos.Stop;
+import delays.query.continuous.pojos.Station;
 import delays.query.continuous.pojos.Train;
 import delays.query.continuous.view.StationBoardView;
 import javafx.application.Platform;
@@ -36,8 +36,8 @@ public class FxTask extends Task<Void> {
          FXCollections.observableArrayList();
 
    private Future<Void> injectorFuture;
-   private ContinuousQuery<Stop, StationBoard> continuousQuery;
-   private RemoteCache<Stop, StationBoard> stationBoards;
+   private ContinuousQuery<Station, StationBoard> continuousQuery;
+   private RemoteCache<Station, StationBoard> stationBoards;
    private RemoteCacheManager remote;
 
    private BlockingQueue<StationBoardView> queue = new ArrayBlockingQueue<>(128);
@@ -93,17 +93,17 @@ public class FxTask extends Task<Void> {
 
       // TODO: Move protobuf code out
       RemoteCache<String, String> metaCache = remote.getCache(ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME);
-      metaCache.put("sbb.proto", Util.read(FxTask.class.getResourceAsStream("/sbb.proto")));
+      metaCache.put("real-time.proto", Util.read(FxTask.class.getResourceAsStream("/real-time.proto")));
       String errors = metaCache.get(ProtobufMetadataManagerConstants.ERRORS_KEY_SUFFIX);
       if (errors != null)
          throw new AssertionError("Error in proto file");
 
       SerializationContext ctx = ProtoStreamMarshaller.getSerializationContext(remote);
-      ctx.registerProtoFiles(FileDescriptorSource.fromResources("sbb.proto"));
+      ctx.registerProtoFiles(FileDescriptorSource.fromResources("real-time.proto"));
       ctx.registerMarshaller(new GeoLoc.Marshaller());
       ctx.registerMarshaller(new StationBoard.Marshaller());
-      ctx.registerMarshaller(new StationBoardEntry.Marshaller());
       ctx.registerMarshaller(new Stop.Marshaller());
+      ctx.registerMarshaller(new Station.Marshaller());
       ctx.registerMarshaller(new Train.Marshaller());
 
       injectorFuture = Injector.cycle(stationBoards);
@@ -112,32 +112,30 @@ public class FxTask extends Task<Void> {
             .having("entries.delayMin").gt(0L)
             .build();
 
-      ContinuousQueryListener<Stop, StationBoard> listener = new ContinuousQueryListener<Stop, StationBoard>() {
+      ContinuousQueryListener<Station, StationBoard> listener = new ContinuousQueryListener<Station, StationBoard>() {
          @Override
-         public void resultJoining(Stop key, StationBoard value) {
-            value.getEntries().stream()
-                  .filter(e -> e.getDelayMin() > 0)
+         public void resultJoining(Station key, StationBoard value) {
+            value.entries.stream()
+                  .filter(e -> e.delayMin > 0)
                   .forEach(e -> {
-                     System.out.println(e);
+                     //System.out.println(e);
                      queue.add(new StationBoardView(
-                           e.getTrain().getCat(),
-                           String.format("%tR", e.getDepartureTs()),
-                           key.getName(),
-                           e.getTrain().getTo(),
-                           "+" + e.getDelayMin(),
-                           e.getTrain().getName()
+                           e.train.cat,
+                           String.format("%tR", e.departureTs),
+                           key.name,
+                           e.train.to,
+                           "+" + e.delayMin,
+                           e.train.name
                      ));
                   });
          }
 
          @Override
-         public void resultUpdated(Stop key, StationBoard value) {
-            // TODO...
+         public void resultUpdated(Station key, StationBoard value) {
          }
 
          @Override
-         public void resultLeaving(Stop key) {
-            // TODO...
+         public void resultLeaving(Station key) {
          }
       };
 
