@@ -13,21 +13,19 @@ This is a repository contaning example applications/demos on how to use Infinisp
 The demos presented in this repository use rail-based transport as theme.
 The domain is constructed out of the following entities:
 
-* Train: A train that transport passengers around the country.
-It contains:
+* `Train` - a train that transport passengers around the country, it contains:
   * A name, e.g. `ICN 531`)
   * A destination, e.g. `Basel SBB`
   * Category, e.g. `ICE` for intercity europe trains
   * An identifier.
   The identifier is a concatenation of the train name, destination and departure time.
 
-* Station: Represents a physical train station.
-It contains:
+* `Station` - represents a physical train station, it contains:
   * A numeric identifier, e.g. `8501008`
   * A name (e.g. `Basel SBB`)
   * A geographic location including latitude and longitude information. 
 
-* Stop: Represents a train's passing through a station.
+* `Stop` - represents a train's passing through a station.
 It represents each of the entries in a given station's train board.
 It contains:
   * Train information, as described above.
@@ -35,8 +33,7 @@ It contains:
   * The platform where the train is expected to stop.
   * If train is delayed, the number of minutes that a train is delayed going through the station.
 
-* Station Board: Represents the list of train stops through a station at a given time.
-It contains:
+* `StationBoard` - represents the list of train stops through a station at a given time, contains:
   * Station board entries represented as upcoming trains to stop in this station.
   * Time when the station board information was collected.
 
@@ -70,7 +67,8 @@ Next, a query is defined as matching any station boards where at least one of th
 
 Once the query is defined, a continuous query listener is attached to it:
 
-      ContinuousQueryListener<Station, StationBoard> listener = new ContinuousQueryListener<Station, StationBoard>() {
+      ContinuousQueryListener<Station, StationBoard> listener = 
+               new ContinuousQueryListener<Station, StationBoard>() {
          @Override
          public void resultJoining(Station key, StationBoard value) {
             // ...
@@ -93,10 +91,16 @@ Once the query is defined, a continuous query listener is attached to it:
 When the demo application runs, it cycles through some cached station board data and injects that information to the remote cache.
 As data gets updated and delayed station board entries are found, these are presented in a JavaFX based table.  
 
-## Running Real Time Demo
+## Running Demo
 
 1. Execute `run-servers.sh`. 
 It starts three Infinispan Server instances forming a domain.
 The cache that the demo interacts with is defined as being distributed with 2 copies, so it can cope with 1 server going down and still keep all data.
 
 2. Execute `delays.query.continuous.FxApp` application.
+
+## TODOS
+
+- [ ] Remove duplicates train id duplicates from dashboard
+- [ ] Implement CQ result set leaving
+- [ ] Implement CQ result set updating
