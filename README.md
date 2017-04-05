@@ -65,11 +65,16 @@ This demo uses protocol buffers to describe the types involved in the demo so th
 This is necessary so that the remote server task can work with user types as opposed to binary data.
 This means that when the demo starts, there are a few set up invocations:
 
-* ...
+* For each type stored, declare it as a protocol buffers message type in a `.proto` file.
+* Store the `.proto` file in the Infinispan Server's protobuf metadata cache.
+* Store `.proto` file and a marshaller for each of the message types in the client. 
+* Store proto marshallers in server via the execution of a remote task.
 
+Once the set up is complete, the demo will store 3 week's worth of data from station boards.
+After data loading has completed, the analytics task can be executed returns the result of the distributed analytics computation to the client.
+The client then stores results in an intermediate cache, which then can be consumed by a Jupyter notebook to provide a plot that answers the question posed above.
 
-it will store the historic data which in this case it's 3 week's worth of data.
-Once the data is loaded 
+Below are more detailed instructions on how to run the demo.
 
 ## Running Demo
 
@@ -88,7 +93,9 @@ The second tasks is the task that will calculate the ratio of delayed trains acr
     $ mvn clean install package -am -pl analytics-server
     $ mvn wildfly:deploy -pl analytics-server
 
-Then, run the data injector and calculate the ratio of delayed trains across the day by executing `delays.java.stream.AnalyticsApp` class.
+Then, run the data injector, `delays.java.stream.InjectApp`, to add the data into servers.  
+
+With data loaded, calculate the ratio of delayed trains across the day by executing `delays.java.stream.AnalyticsApp` class.
 
 Once the data injector and the delayed trains ratio has been calculated, start the Jupyter notebook:
 
@@ -237,9 +244,3 @@ Some of these tests exercise JavaFX capabilities (e.g. `FxTest` and `FxTaskTest`
 Other tests verify other aspects, such as basic remote continous queries, JSON parsing and GZIP'ing.
 
 Finally, a CLI version of the real-time demo is available which is not as dynamic as the JavaFX version.
-
-## TODOS
-
-- [ ] Remove duplicates train id duplicates from dashboard
-- [ ] Implement CQ result set leaving
-- [ ] Implement CQ result set updating
