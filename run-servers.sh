@@ -4,7 +4,7 @@ set -e
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 SERVER_ROOT=..
-SERVER_HOME=$SERVER_ROOT/infinispan
+SERVER_HOME=$SERVER_ROOT/infinispan-server-9.0.0.Final
 CLUSTER_SIZE_MAIN="/host=master/server=server-three/subsystem=datagrid-infinispan/cache-container=clustered:read-attribute(name=cluster-size)"
 
 
