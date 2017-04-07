@@ -20,11 +20,11 @@ function waitForClusters()
 }
 
 
-rm -drf $SERVER_ROOT/infinispan-server-9.0.0.CR3
+rm -drf $SERVER_ROOT/infinispan-server-9.0.0.Final
 echo "Remove old server directory."
 
 
-unzip $SERVER_ROOT/infinispan-server-9.0.0.CR3-bin.zip -d $SERVER_ROOT
+unzip $SERVER_ROOT/infinispan-server-9.0.0.Final-bin.zip -d $SERVER_ROOT
 echo "Unzipped server"
 
 
