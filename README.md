@@ -1,3 +1,22 @@
+**Table of Contents**
+
+- [Introduction](#)
+- [Pre-requisites](#)
+- [Application Domain](#)
+- [Analytics Demo](#)
+	- [Running Demo](#)
+	- [Testsuite](#)
+		- [WordCountTest](#)
+		- [Jupyter Test](#)
+	- [Reference](#)
+		- [Server Configuration Explained](#)
+- [Real Time Demo](#)
+	- [Running Demo](#)
+	- [Testsuite](#)
+- [Live Events](#)
+- [Blogs](#)
+
+
 # Introduction 
 
 This is a repository contaning example applications/demos on how to use Infinispan for real-time and offline analytics use cases.
