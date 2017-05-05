@@ -97,7 +97,7 @@ Below are more detailed instructions on how to run the demo.
 
 ## Running Demo
 
-Starts the serves by executing:
+Starts the servers by executing:
 
     $ ./run-servers.sh 
 
