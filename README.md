@@ -244,3 +244,9 @@ Some of these tests exercise JavaFX capabilities (e.g. `FxTest` and `FxTaskTest`
 Other tests verify other aspects, such as basic remote continous queries, JSON parsing and GZIP'ing.
 
 Finally, a CLI version of the real-time demo is available which is not as dynamic as the JavaFX version.
+
+# Blogs
+
+Here's a list of blog posts where this demo has been featured:
+
+* 7th April 2017 - [In Memory Data Grid Patterns Demos from Devoxx France!](http://blog.infinispan.org/2017/04/in-memory-data-grid-patterns-demos-from.html) 
