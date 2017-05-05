@@ -2,24 +2,27 @@
 
 1. Start servers executing: 
 
-
-    $ cd ~/0/events/devoxxFr17/datagrid-patterns
-    $ ./run-servers.sh
+```bash
+$ cd ~/datagrid-patterns
+$ ./run-servers.sh
+```
 
 2. Deploy server tasks:
 
-    
-    $ cd 0/events/devoxxFr17/datagrid-patterns/analytics
-    $ mvn clean install package -am -pl analytics-server
-    $ mvn wildfly:deploy -pl analytics-server
+```bash
+$ cd ~/datagrid-patterns/analytics
+$ mvn clean install package -am -pl analytics-server
+$ mvn wildfly:deploy -pl analytics-server
+```
 
 2. From IDE, run InjectApp program
 
 3. Start Jupyter notebook:
 
-
-    $ cd ~/0/events/devoxxFr17/datagrid-patterns/analytics/analytics-jupyter
-    $ ~/anaconda/bin/jupyter notebook
+```bash
+$ cd ~/datagrid-patterns/analytics/analytics-jupyter
+$ ~/anaconda/bin/jupyter notebook
+```
 
 Then, open live-demo.ipynb file
 

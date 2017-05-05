@@ -245,6 +245,15 @@ Other tests verify other aspects, such as basic remote continous queries, JSON p
 
 Finally, a CLI version of the real-time demo is available which is not as dynamic as the JavaFX version.
 
+
+# Live Events
+ 
+Here's a list of conferences and user groups where this demo has been presented.
+The `live-events` folder contains step-by-step instructions of the demos, as presented in these live events:
+
+* 6th May 2017 - Devoxx France
+
+
 # Blogs
 
 Here's a list of blog posts where this demo has been featured:
