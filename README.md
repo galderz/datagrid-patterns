@@ -271,9 +271,13 @@ Here's a list of conferences and user groups where this demo has been presented.
 The `live-events` folder contains step-by-step instructions of the demos, as presented in these live events:
 
 * 6th May 2017 - Devoxx France
-[[slides](https://speakerdeck.com/galderz/patterns-dutilisation-de-systemes-in-memory)]
-[[video](https://www.youtube.com/watch?v=ATh1PuTho-M)]
-[[live demo steps](live-events/devoxxFr17.md)]
+(
+[slides](https://speakerdeck.com/galderz/patterns-dutilisation-de-systemes-in-memory)
+|
+[video](https://www.youtube.com/watch?v=ATh1PuTho-M)
+|
+[live demo steps](live-events/devoxxFr17.md)
+)
 
 
 # Blogs
