@@ -273,6 +273,7 @@ The `live-events` folder contains step-by-step instructions of the demos, as pre
 * 6th May 2017 - Devoxx France
 [[slides](https://speakerdeck.com/galderz/patterns-dutilisation-de-systemes-in-memory)]
 [[video](https://www.youtube.com/watch?v=ATh1PuTho-M)]
+[[live demo steps](live-events/devoxxFr17.md)]
 
 
 # Blogs
