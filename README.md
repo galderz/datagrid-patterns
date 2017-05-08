@@ -270,7 +270,7 @@ Finally, a CLI version of the real-time demo is available which is not as dynami
 Here's a list of conferences and user groups where this demo has been presented.
 The `live-events` folder contains step-by-step instructions of the demos, as presented in these live events:
 
-* 6th May 2017 - Devoxx France
+* 6th April 2017 - Devoxx France
 (
 [slides](https://speakerdeck.com/galderz/patterns-dutilisation-de-systemes-in-memory)
 |
