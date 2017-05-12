@@ -65,6 +65,8 @@ public class FxTask extends Task<Void> {
       addProtoMarshallersToClient(client);
 
       injectorFuture = Injector.cycle(stationBoards);
+
+      // Continuous query code
       QueryFactory qf = Search.getQueryFactory(stationBoards);
       Query query = qf.from(StationBoard.class)
             .having("entries.delayMin").gt(0L)
