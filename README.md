@@ -112,7 +112,7 @@ The second tasks is the task that will calculate the ratio of delayed trains acr
     $ mvn clean install package -am -pl analytics-server
     $ mvn wildfly:deploy -pl analytics-server
 
-Then, run the data injector, `delays.java.stream.InjectApp`, to add the data into servers.  
+Then, run the data injector, `delays.java.stream.InjectApp`, to add the data into servers. You must run the injector app (e.g. from your IDE) using `./analytics/analytics-client` as your base directory, this is require to fin the gzipped data file.
 
 With data loaded, calculate the ratio of delayed trains across the day by executing `delays.java.stream.AnalyticsApp` class.
 
