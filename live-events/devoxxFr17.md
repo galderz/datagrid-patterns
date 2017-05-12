@@ -42,6 +42,8 @@ Then, open live-demo.ipynb file
 ## Actions
 
 1. Execute AnalyticsApp from IDE
+    1. Show that it outputs results into another cache
+    2. Show the `DelayRatioTask` being executed on the server
 2. Go Jupyter notebook and execute each cell individually
 
 
